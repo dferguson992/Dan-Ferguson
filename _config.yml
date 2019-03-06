@@ -1,4 +1,4 @@
-#theme: jekyll-theme-time-machine
-remote_theme: olakara/JekyllMetro
+theme: jekyll-theme-time-machine
+#remote_theme: olakara/JekyllMetro
 
 exclude: [Gemfile, Gemfile.lock, README.md, .gitignore, CNAME, LICENSE]
