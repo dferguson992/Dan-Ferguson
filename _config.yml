@@ -1,1 +1,3 @@
 theme: slate
+
+exclude: [Gemfile, Gemfile.lock, README.md, .gitignore, CNAME, LICENSE]
