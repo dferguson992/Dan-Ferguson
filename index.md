@@ -5,6 +5,7 @@ Ippon Blog Publications
 - [Using Swagger To Build Effective APIs Part 2 - Ippon Technologies](https://blog.ippon.tech/using-swagger-to-build-effective-apis-pt2)
 - [Using Swagger To Build Effective APIs Part 3 - Ippon Technologies](https://blog.ippon.tech/using-swagger-to-build-effective-apis)
 - [AWS White Paper in 5 Minutes or Less: Best Practices for Amazon EMR](https://blog.ippon.tech/aws-white-paper-in-5-minutes-or-less-best-practices-for-amazon-emr/)
+- [Ippon's RVA WAR Tour](https://blog.ippon.tech/ippons-rva-war-tour/)
 
 ## Certifications
 ![](AWS_Certified_Logo_294x230_Color.png)
