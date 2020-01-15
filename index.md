@@ -1,6 +1,8 @@
 ## Publications
 Ippon Blog Publications
+- [Creating an Event Driven jHipster Application with Solace](https://blog.ippon.tech/creating-an-event-driven-jhipster-application-with-solace/)
 - [Comparing Java LTS Releases - Ippon Technologies](https://blog.ippon.tech/comparing-java-lts-releases/)
+- [Java 13 Release Explained](https://blog.ippon.tech/java-13/)
 - [Using Swagger To Build Effective APIs Part 1 - Ippon Technologies](https://blog.ippon.tech/using-swagger-to-build-effective-apis-pt1)
 - [Using Swagger To Build Effective APIs Part 2 - Ippon Technologies](https://blog.ippon.tech/using-swagger-to-build-effective-apis-pt2)
 - [Using Swagger To Build Effective APIs Part 3 - Ippon Technologies](https://blog.ippon.tech/using-swagger-to-build-effective-apis)
@@ -13,8 +15,12 @@ Ippon Blog Publications
 - [AWS Developer Associate](https://www.certmetrics.com/amazon/public/badge.aspx?i=1&t=c&d=2019-01-31&ci=AWS00666114)
 - [AWS Solutions Architect Associate](https://www.certmetrics.com/amazon/public/badge.aspx?i=2&t=c&d=2018-12-11&ci=AWS00666114)
 - [AWS Solutions Architect Professional](https://www.certmetrics.com/amazon/public/badge.aspx?i=4&t=c&d=2019-04-16&ci=AWS00666114)
+- AWS Subject Matter Expert
+![](confluentimage.png)
+- [Confluent Certified Developer for Apache Kafka](https://images.credential.net/9k4v12ay.png)
 
 ## Web & Media
+- [@FergInTheClouds](https://twitter.com/ferg_in)
 - [Ippon Podcast Site](https://podcast.ipponway.com/)
   This site was built as more of a side project by me as a way to learn how to use React.  The backend is a serverless architecture powered by AWS Amplify.  It uses S3 for media storage, CloudFront for caching and content delivery, ACM to provision the TLS certificate, and Route53 for domain name resolution.  I also helped produce and record some of the podcasts found on this site.  The current design was build by an Ippon front-end developer using React.
 - [Richmond Java Users Group](https://www.meetup.com/Richmond-Java-Users-Group/)
