@@ -8,6 +8,8 @@ Ippon Blog Publications
 - [Using Swagger To Build Effective APIs Part 3 - Ippon Technologies](https://blog.ippon.tech/using-swagger-to-build-effective-apis)
 - [AWS White Paper in 5 Minutes or Less: Best Practices for Amazon EMR](https://blog.ippon.tech/aws-white-paper-in-5-minutes-or-less-best-practices-for-amazon-emr/)
 - [Ippon's RVA WAR Tour](https://blog.ippon.tech/ippons-rva-war-tour/)
+- [Creating an Event Driven jHipster Application with Solace](https://blog.ippon.tech/creating-an-event-driven-jhipster-application-with-solace/)
+- [Solace and Healthcare, a HIPAA Compliant Message Bus](https://blog.ippon.tech/hipaa-compliant/)
 
 ## Certifications
 ![](AWS_Certified_Logo_294x230_Color.png)
