@@ -2,3 +2,6 @@ theme: jekyll-theme-time-machine
 #remote_theme: olakara/JekyllMetro
 
 exclude: [Gemfile, Gemfile.lock, README.md, .gitignore, CNAME, LICENSE]
+
+plugins:
+  - jekyll-gist
