@@ -28,3 +28,5 @@ Ippon Blog Publications
   This site was built as more of a side project by me as a way to learn how to use React.  The backend is a serverless architecture powered by AWS Amplify.  It uses S3 for media storage, CloudFront for caching and content delivery, ACM to provision the TLS certificate, and Route53 for domain name resolution.  I also helped produce and record some of the podcasts found on this site.  The current design was build by an Ippon front-end developer using React.
 - [Richmond Java Users Group](https://www.meetup.com/Richmond-Java-Users-Group/)
   I hosted a talk at the Richmond JUG Meetup on June 19th, 2019 concerning the [Evolution of Java towards Functional Development in the Cloud](https://www.meetup.com/Richmond-Java-Users-Group/events/261872467/).  For a recording of the talk, check out our listing on [Anchor.fm](https://anchor.fm/ippon-technologies/episodes/The-Consolidation-of-Functional-Development-e4d4ks)
+
+{% twitter https://twitter.com/jekyllrb maxwidth=500 limit=5 %}
