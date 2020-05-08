@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
-gem "github-pages", group: :jekyll_plugins
-gem 'jekyll-twitter-plugin'
-gem "slate"
+group :jekyll_plugins do
+    gem 'github-pages'
+	gem 'jekyll-twitter-plugin'
+	gem "slate"
+end
+
