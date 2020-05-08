@@ -185,6 +185,7 @@ GEM
       jekyll-seo-tag (~> 2.0)
     jekyll-titles-from-headings (0.5.1)
       jekyll (~> 3.3)
+    jekyll-twitter-plugin (2.1.0)
     jekyll-watch (2.1.2)
       listen (~> 3.0)
     jemoji (0.10.2)
@@ -251,7 +252,11 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
+  jekyll-twitter-plugin
   slate
 
+RUBY VERSION
+   ruby 2.7.0p0
+
 BUNDLED WITH
-   2.0.1
+   2.1.2
