@@ -1,0 +1,782 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Best Practices for Amazon EMR - Ferg in the Clouds</title>
+<meta name="description" content="This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper can be found here and I encourage anyone working with EMR in the long-term to read it, as it is full of easy to understand concepts which will improve your use of EMR.  Some of the technical details are a little dated though, so anything very detailed should be double checked.  Those details are beyond the scope of this post; readers of this post should be looking to refresh their memories at a high level the best strategies for using EMR.  ">
+
+
+  <meta name="author" content="Dan Ferguson">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ferg in the Clouds">
+<meta property="og:title" content="Best Practices for Amazon EMR">
+<meta property="og:url" content="http://localhost:4000/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr">
+
+
+  <meta property="og:description" content="This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper can be found here and I encourage anyone working with EMR in the long-term to read it, as it is full of easy to understand concepts which will improve your use of EMR.  Some of the technical details are a little dated though, so anything very detailed should be double checked.  Those details are beyond the scope of this post; readers of this post should be looking to refresh their memories at a high level the best strategies for using EMR.  ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-05-10T00:00:00-04:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Dan Ferguson",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/ferg_in","https://www.linkedin.com/in/yourprofile"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ferg in the Clouds Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Ferg in the Clouds
+          <span class="site-subtitle">Dan's Blog</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/aboutme/">About Me</a>
+            </li><li class="masthead__menu-item">
+              <a href="/profexp/">Professional Experience</a>
+            </li><li class="masthead__menu-item">
+              <a href="/certs/">Certifications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/posts/">Blog Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/media/">Media</a>
+            </li><li class="masthead__menu-item">
+              <a href="/unprofesh/">Un-Professional</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/posts" itemprop="item"><span itemprop="name">Posts</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Best Practices for Amazon EMR</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/logo.png" alt="Dan Ferguson" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Ferguson</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Solutions Architect and the author of this blog.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">New York, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Best Practices for Amazon EMR</h1>
+    
+    <p>This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper can be found <a href="https://d0.awsstatic.com/whitepapers/aws-amazon-emr-best-practices.pdf">here</a> and I encourage anyone working with EMR in the long-term to read it, as it is full of easy to understand concepts which will improve your use of EMR.  Some of the technical details are a little dated though, so anything very detailed should be double checked.  Those details are beyond the scope of this post; readers of this post should be looking to refresh their memories at a high level the best strategies for using EMR.</p>
+
+<h1 id="main-takeaways">Main Takeaways</h1>
+<ol>
+  <li>S3 is the recommended option over HDFS much of the time</li>
+  <li>Use Transient Clusters for your workloads to save on cost</li>
+  <li>Amazon EMR team has spent a lot of time tuning default settings, so don’t tweak default settings unless you really know what you’re doing and why you need to do it.
+    <h1 id="moving-data-into-emrs">Moving Data Into EMRS</h1>
+    <h4 id="emrs-is-best-populated-from-s3">EMRS is best populated from S3</h4>
+    <p>When populated EMRS from an existing cluster for the first time, it is best to use S3 as an escrow data storage location for your on-prem HDFS/non-HDFS data.<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.55.26-AM.png" alt="Screen-Shot-2019-05-10-at-9.55.26-AM" /></p>
+    <h4 id="use-s3distcp-to-copy-data-to-s3">Use S3DistCp to copy data to S3</h4>
+    <p>S3DistCp is the same as the Hadoop binary DistCp, except it takes advantage of multi-part upload to S3 for larger files.  Hadoop is optimized for large file blocks, so it is usually best to use S3DistCp for copying HDFS files from an external data center or local disk to S3 to take advantage of this optimization.</p>
+    <h4 id="s3distcp-is-faster-than-distcp">S3DistCp is faster than DistCp</h4>
+    <p>The exception to this may come in very specific instances, where you need to specify the number of mappers needed for your copy job.  DistCp allows you to specify the number of mappers using CLI flags, whereas S3DistCp does not.  It is possible DistCp could perform faster in some cases when the proper number of mappers need to be specified manually.  However, the default formula used by DistCp is usually the best option for most workloads, which means S3DistCp is your best bet for copying data.
+<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.51.20-AM.png" alt="Screen-Shot-2019-05-10-at-9.51.20-AM" /></p>
+    <h4 id="aws-importexport-or-storage-volume-gateway-to-copy-non-hdfs-data-into-s3">AWS Import/Export or Storage Volume Gateway to copy non-HDFS data into S3</h4>
+    <p>Recommended AWS supported option for transferring data from a non-HDFS source to S3 at the time of publication.  At the time of this post’s writing, you could likely replace Import/Export with a Storage Gateway Volume which writes directly to S3.</p>
+    <h4 id="copy-from-s3-to-emr">Copy from S3 to EMR</h4>
+    <p>Use the S3DistCp command to copy the data from your S3 bucket onto a Core Node.  Run the command on a core node, specifying the HDFS directory as the destination.  Let EMR handle the redundant copies to the other core nodes in the cluster.  You cannot run this on a Task or Master node as those nodes do not have HDFS on them.</p>
+    <h4 id="emrfs--hdfs">EMRFS &gt; HDFS</h4>
+    <p>Use EMRFS over HDFS to take advantage of S3 as a storage layer.  This works well when continuously adding data to your EMR cluster.  It is better to forward logs to S3 than directly to HDFS.  But when your cluster uses EMRFS, it gets the updates to the file system from S3.  This allows you to take advantage of bucket policies, bucket encryption, and object versioning for your EMR files.</p>
+    <h5 id="consistent-view">Consistent View</h5>
+    <p>For more information on how S3 bypasses eventual consistency for new PUT requests, check out <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-consistent-view.html">Consistent View</a>, a special feature of EMR which utilizes DynamoDB to bypass the eveentual consistency model employed by S3.</p>
+    <h4 id="iterative-jobs-should-use-hdfs-only">Iterative Jobs Should Use HDFS Only</h4>
+    <p>Do not use S3 and EMRFS for iterative jobs, as you will introduce additional costs and latency for all of the repeated S3 GETs.</p>
+    <h1 id="aggregating-data-for-mapreduce">Aggregating Data for MapReduce</h1>
+    <h4 id="fewer-large-files--many-small-files">Fewer Large Files &gt; Many Small Files</h4>
+    <p>This scheme takes advantage of multi-part uploads to S3, and reduces the number of connections required to upload data.  Additionally, fewer files stored in S3 improves performance for EMR reads on S3.</p>
+    <h4 id="log-forwarding">Log Forwarding</h4>
+    <p>Where possible use a log forwarding framework like Apache Flume or Fluentd and write directly to the S3 bucket.</p>
+    <h4 id="aggregate-logs-based-on-size">Aggregate Logs Based on Size</h4>
+    <p>If your log aggregator can aggregate logs based on size, try to split your log files into large 1GB or 2GB chuncks.  This will be most performant for EMR.  If you cannot aggregate on size, aggregate on time taking into consideration log volume over time.</p>
+    <h5 id="recall-the-map-in-mapreduce">Recall the “Map” in MapReduce</h5>
+    <p>This stage breaks large files into chunks for parallel processing.  That is why it is best to upload large files to HDFS or S3 for EMRFS.<br />
+<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.51.40-AM.png" alt="Screen-Shot-2019-05-10-at-9.51.40-AM" /></p>
+    <h4 id="compress-your-files-before-processing">Compress Your Files Before Processing</h4>
+    <p>This will save on data transfer costs.  Recall though, EMR splits up files phase.  Make sure you consider your compression algorithm with your log aggregator.  Some compression schemes like GZip and Snappy will not allow the resulting compressed file to be split.  In that case, try not to surpass 1GB per compressed file.  If you do choose a “splitable” compression algorithm like LZO or BZip2, you can drastically increase the size of your compressed files up to 4GB.  Choose intelligently based on required compression speeds and ratios.  These factors are more important than choosing an aggregated file size.  <strong>You will hit a bottleneck in compression speed and ratios before you take a performance hit on S3 for logging more files.</strong>
+<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.51.58-AM.png" alt="Screen-Shot-2019-05-10-at-9.51.58-AM" /></p>
+    <h4 id="consider-compressing-mapper-outputs">Consider compressing Mapper Outputs</h4>
+    <p>EMR allows you to compress the output of the “Map” function, during the “Reduce” function.  This is something to consider to save on data transfer costs.  You can enable this in the core node properties.</p>
+    <h4 id="consider-compressing-mapper-outputs-in-memory">Consider compressing Mapper Outputs in Memory</h4>
+    <p>EMR allows you to compress the memory footprint of the “Map” function as well.  This is an important consideration for large jobs that need to be completed quickly.  If there is a large amount of data to map, compressing the output of the mappers in memory will prevent the output from being written to disk.  You can enable this in the core node properties.
+<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.52.11-AM.png" alt="Screen-Shot-2019-05-10-at-9.52.11-AM" /></p>
+    <h1 id="tuning-emr">Tuning EMR</h1>
+    <h4 id="instance-size">Instance Size</h4>
+    <p>Use M2 instances for jobs requiring lots of memory.  C1 or C2 instances provide larger compute resources.  Consider spinning up clusters repeatedly until you discover the most performant instances for your workload.  Keep in mind, larger memory pools prevent disk writes while larger CPU pools process jobs faster.</p>
+    <h4 id="mapper-process-count">Mapper Process Count</h4>
+    <p>The best way to calculate this is to rely on the EMR defaults.  If you run a job on a default EMR cluster, you can see in the logs the number of mappers launched to process the job.  Divide this value with the number of Core and Task nodes you have.  The result is the number of mappers per EC2 instance.  From there, you can determine how many mappers per EC2 you will need, and can then make a decision on the instance sizes you will create in your cluster.
+<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.52.24-AM.png" alt="Screen-Shot-2019-05-10-at-9.52.24-AM" /></p>
+    <h4 id="transient-clusters">Transient Clusters</h4>
+    <p>If the number of processesing hours on your cluster is less than a day, spin up a transient cluster.  The cluster will be terminated after the job is done, and you will save on costs.  Additionally, consider transient clusters when using EMRFS, as the data will be backed up in S3.  When the cluster dies, all cluster data will be backed up to S3, allowing you to resume processing at a later date from where you left off.  Generally, if you’re using S3 for storage, you will benefit from a transient cluster.</p>
+    <h1 id="cost-optimization">Cost Optimization</h1>
+    <h4 id="use-spot-instances-for-task-nodes">Use Spot Instances for Task Nodes</h4>
+    <p>Task nodes offer additional compute, nothing else.  Consider Spot instances for Task nodes to take advantage of EC2 market pricing without introducing potential data loss on your cluster should the Spot instance price rise above what you are willing to pay.</p>
+    <h4 id="purchase-a-reserved-instance-for-heavy-utilized-nodes">Purchase a Reserved Instance for Heavy Utilized Nodes</h4>
+    <p>The master node and the minimum number of Core nodes should be reserved instances.  This guarantees you will always have a node available to orchestrate your cluster as the master node.  Additionally, reserved instances for the Core nodes ensures your cluster can always perform at a minimum high efficiency.</p>
+    <h5 id="using-reserved-instances-requires-deep-workload-knowledge">Using Reserved Instances requires deep workload knowledge</h5>
+    <p>Only purchase Reserved Instances after you know what your cluster’s workload will look like.  Only purchase reserved instances to cover the predictable, steady-state workload of the cluster.  Spot or on-demand instances should act as a buffer for workloads exceeding expectations.
+<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.52.49-AM.png" alt="Screen-Shot-2019-05-10-at-9.52.49-AM" /></p>
+    <h1 id="design-patterns">Design Patterns</h1>
+    <h4 id="s3--emrfs--hdfs">S3 &amp; EMRFS &gt; HDFS</h4>
+    <p>This is pushed by AWS as the best option for most workloads.<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.55.39-AM.png" alt="Screen-Shot-2019-05-10-at-9.55.39-AM" /></p>
+    <h4 id="s3--hdfs">S3 &amp; HDFS</h4>
+    <p>Store data on S3 and copy to HDFS.  Introduces start up latency, but is preferred for iterative workloads to save on S3 GET requests.<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.55.46-AM.png" alt="Screen-Shot-2019-05-10-at-9.55.46-AM" /></p>
+    <h4 id="hdfs-with-s3-backup">HDFS with S3 Backup</h4>
+    <p>Use the HDFS on the core nodes, and backup to S3 whenever needed.</p>
+    <h4 id="manual-tuning">Manual Tuning</h4>
+    <p>Use EMR console and CloudWatch to tune and configure EMR Cluster to fit your use case.
+<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.55.56-AM.png" alt="Screen-Shot-2019-05-10-at-9.55.56-AM" /></p>
+    <h4 id="automatic-tuning">Automatic Tuning</h4>
+    <p>Use CloudWatch alarms to tune EMR in response to your cluster’s performance monitoring.
+<img src="https://blog.ippon.tech/content/images/2019/05/Screen-Shot-2019-05-10-at-9.56.05-AM.png" alt="Screen-Shot-2019-05-10-at-9.56.05-AM" />
+This image comes from the white paper.  The image suggests using Elastic Beanstalk as an intermediary between SNS and the EMR API.  The Beanstalk instance must be configured to interpret SNS messages generated by EMR CloudWatch alarms into EMR API commands.  Given the date of publication of this white paper, Beanstalk may not be the best service to use in this case any more.  I would suggest using API Gateway with Lambda functions to convert the SNS messages into EMR API calls; but the specific use case is relevant to the individual workload.</p>
+    <h1 id="summary-of-themes">Summary of Themes</h1>
+  </li>
+  <li>S3 with EMRFS and Consistent Views works great on Transient Clusters.</li>
+  <li>Compress your files intelligently based on required compression speeds and ratios.  Adjust your aggregated file size to reflect the splittability of the compression algorithm chosen.  If you cannot split the compressed files, ensure your files are no larger than 1GB.</li>
+  <li>Do not use S3 for workloads which consistently read against the log data</li>
+  <li>Purchase Reserved Instances to cover baseline, predictable workloads.  Purchase Spot instances for Task nodes, but not Core and Master nodes as the immediate removal of a Core or Master node could compromise the cluster’s health.</li>
+  <li>Partition your data intelligently, based on how you will use it.  If your log data is time sensitive, partition the logs based on time.  Make sure your files are on the larger side to take advantage of EMRFS/HDFS file processing.</li>
+</ol>
+
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">1</span>
+      </a>
+    </li>
+  
+    <li>
+      <a href="#2019">
+        <strong>2019</strong> <span class="taxonomy__count">9</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/hipaa-compliant-message-bus" rel="permalink">Building a HIPAA Compliant Message Bus with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  11 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">What is Solace?
+Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace Pu...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+  <section id="2019" class="taxonomy__section">
+    <h2 class="archive__subtitle">2019</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/creating-an-event-driven-jhipster-application-with-solace" rel="permalink">Creating an Event Driven jHipster Application with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on wh...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-well-architected-2020" rel="permalink">AWS Well-Architected 2020
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon USA has been working to lock in Well-Architected status in the North America region for the last six months.  By the end of 2019, Ippon USA will join I...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/java-13-release-features" rel="permalink">Java 13 Release Features
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, S...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/ippons-rva-war-tour" rel="permalink">Ippon’s RVA WAR Tour
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, an...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr" rel="permalink">Best Practices for Amazon EMR
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper c...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-3" rel="permalink">Using Swagger to Build Effective APIs Part 3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-2" rel="permalink">Using Swagger to Build Effective APIs Part 2
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-1" rel="permalink">Using Swagger to Build Effective APIs Part 1
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The rise of serverless computing and platform agnostic, app-based services use has forced the casual developer to learn proper API development, a task usuall...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/comparing-java-lts-releases" rel="permalink">Comparing Java LTS Releases
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  18 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The last 5 years have seen some rapid changes in the way new versions of the Java Development Kit is deployed and maintained.  Traditionally, new Java versio...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/dferguson992" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Dan Ferguson. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

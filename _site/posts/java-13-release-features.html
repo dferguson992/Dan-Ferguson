@@ -1,0 +1,805 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Java 13 Release Features - Ferg in the Clouds</title>
+<meta name="description" content="Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, September 17th marks the official release date of Java 13.  This release is not LTS (Long-Term Support); many of its features lay the groundwork for larger transitions in the languages long-term development, as seen between versions 8 and 12.  Additionally, it is worth mentioning this release falls under the OpenJDK.  ">
+
+
+  <meta name="author" content="Dan Ferguson">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ferg in the Clouds">
+<meta property="og:title" content="Java 13 Release Features">
+<meta property="og:url" content="http://localhost:4000/posts/java-13-release-features">
+
+
+  <meta property="og:description" content="Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, September 17th marks the official release date of Java 13.  This release is not LTS (Long-Term Support); many of its features lay the groundwork for larger transitions in the languages long-term development, as seen between versions 8 and 12.  Additionally, it is worth mentioning this release falls under the OpenJDK.  ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-09-18T00:00:00-04:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/posts/java-13-release-features">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Dan Ferguson",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/ferg_in","https://www.linkedin.com/in/yourprofile"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ferg in the Clouds Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Ferg in the Clouds
+          <span class="site-subtitle">Dan's Blog</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/aboutme/">About Me</a>
+            </li><li class="masthead__menu-item">
+              <a href="/profexp/">Professional Experience</a>
+            </li><li class="masthead__menu-item">
+              <a href="/certs/">Certifications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/posts/">Blog Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/media/">Media</a>
+            </li><li class="masthead__menu-item">
+              <a href="/unprofesh/">Un-Professional</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/posts" itemprop="item"><span itemprop="name">Posts</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Java 13 Release Features</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/logo.png" alt="Dan Ferguson" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Ferguson</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Solutions Architect and the author of this blog.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">New York, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Java 13 Release Features</h1>
+    
+    <p>Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, September 17th marks the official release date of Java 13.  This release is not LTS (Long-Term Support); many of its features lay the groundwork for larger transitions in the languages long-term development, as seen between versions 8 and 12.  Additionally, it is worth mentioning this release falls under the OpenJDK.</p>
+
+<h1 id="useful-links">Useful Links</h1>
+<ul>
+  <li><a href="https://openjdk.java.net/projects/jdk/13/">JDK 13 JEP Summary</a></li>
+  <li><a href="https://jdk.java.net/13/">JDK 13 Download Link</a></li>
+  <li><a href="https://docs.oracle.com/en/java/javase/13/docs/api/index.html">JDK 13 API Document</a></li>
+  <li><a href="https://blog.ippon.tech/comparing-java-lts-releases/">Comparing Java LTS Releases</a></li>
+</ul>
+
+<h1 id="feature-summary">Feature Summary</h1>
+<p>Let’s take a closer look at some of the features added to Java 13.  These features are broken out by JEP number (JDK Enhancement Proposals).  The JEP indexing system is similar to the more established <a href="https://www.rfc-editor.org/rfc-index.html">RFC protocal</a> used industry-wide to define well-established definitions like TCP (<a href="https://en.wikipedia.org/wiki/April_Fools%27_Day_Request_for_Comments">as well as some less known memos</a>).  The JEP index defines the roadmap for future Java releases, though it is worth mentioning not every JEP makes it into a release (<a href="https://openjdk.java.net/jeps/352">JEP 352</a>, postponed to Java 14).</p>
+
+<p>We’ll start this article with some of the sexier additions to Java in this release, and finish up with features more interesting to the die-hard Java developers out there.</p>
+<h2 id="jep-354---switch-expressions-preview">JEP 354 - Switch Expressions (Preview)</h2>
+<p>JEP 354 is my personal favorite because it is another leap forward in the quest to make Java more functional, and less procedural.  Traditionally, <code class="highlighter-rouge">switch</code> statements perform a sequence of operations based on the value held by the variable you are “switching” on.  Using the <code class="highlighter-rouge">case</code> keyword, developers can execute statements that are dependant on the value of the so-called “switch”.</p>
+
+<p>This paradigm has always possessed a few crucial flaws.  The first being the required <code class="highlighter-rouge">break</code> statement at the end of each case.
+Without the <code class="highlighter-rouge">break</code> statement, a logical switch becomes a sequence of statements.  For example,</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">foo</span> <span class="o">=</span> <span class="s">"foo"</span><span class="o">;</span>
+<span class="k">switch</span><span class="o">(</span><span class="n">foo</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="s">"foo"</span><span class="o">:</span>
+        <span class="n">foo</span> <span class="o">=</span> <span class="s">"I'm a foo."</span>
+    <span class="k">case</span> <span class="s">"bar"</span><span class="o">:</span>
+        <span class="n">foo</span> <span class="o">=</span> <span class="s">"I'm a bar."</span>
+<span class="o">}</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">foo</span><span class="o">);</span>
+</code></pre></div></div>
+<p>will not print out “I’m a foo.”  Instead, it prints out “I’m a bar.” because there was no <code class="highlighter-rouge">break</code> statement halting the execution from going forward.  For large <code class="highlighter-rouge">switch</code> blocks, the extra and unnecessary <code class="highlighter-rouge">break</code> statements can quickly bloat your code.</p>
+
+<p>The other crucial flaw with traditional <code class="highlighter-rouge">switch</code> statements is scope is shared across every <code class="highlighter-rouge">case</code> statement in the block.  This means any variable declared in one <code class="highlighter-rouge">case</code> block exists in another <code class="highlighter-rouge">case</code> block.</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">foo</span> <span class="o">=</span> <span class="s">"foo"</span><span class="o">;</span>
+<span class="kt">boolean</span> <span class="n">semaphore</span><span class="o">;</span>
+<span class="k">switch</span><span class="o">(</span><span class="n">foo</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="s">"foo"</span><span class="o">:</span>
+        <span class="kt">boolean</span> <span class="n">result</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="n">semaphore</span> <span class="o">=</span> <span class="n">result</span><span class="o">;</span>
+    <span class="k">case</span> <span class="s">"bar"</span><span class="o">:</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">result</span><span class="o">);</span>
+        <span class="kt">boolean</span> <span class="n">result</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="n">semaphore</span> <span class="o">=</span> <span class="n">result</span><span class="o">;</span>
+</code></pre></div></div>
+<p>In this example, the first <code class="highlighter-rouge">case</code> block is executed.  The variable <code class="highlighter-rouge">result</code> is initialized, and it is used to assign a value to a boolean outside the switch’s scope.  Then, the second <code class="highlighter-rouge">case</code> block is executed.  Technically, an error would be thrown because we are trying to create a variable <code class="highlighter-rouge">result</code> when one already exists.  But if the error was not thrown, the application would print “true” because the value of <code class="highlighter-rouge">result</code> is passed down from the first <code class="highlighter-rouge">case</code> statement.  To get around this, you would have to create a variable <code class="highlighter-rouge">result2</code>.  This creates additional unnecessary lines of code and those extra, hardly used variables create more overhead for the garbage collector.</p>
+
+<p>In Java 13, the new <code class="highlighter-rouge">switch</code> statement does away with the <code class="highlighter-rouge">break</code> statement, and it creates an individual scope for each <code class="highlighter-rouge">case</code> clause.  It also introduces the <code class="highlighter-rouge">yield</code> keyword, which is a great way to return values from <code class="highlighter-rouge">switch</code> clauses.  The <code class="highlighter-rouge">yield</code> keyword also allows <code class="highlighter-rouge">switch</code> blocks to be used declaratively as statements.  Take the above example, if we were to rewrite it in Java 13, we would have the following:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">foo</span> <span class="o">=</span> <span class="s">"foo"</span><span class="o">;</span>
+<span class="kt">boolean</span> <span class="n">semaphore</span> <span class="o">=</span> <span class="k">switch</span><span class="o">(</span><span class="n">foo</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="s">"foo"</span> <span class="o">-&gt;</span> <span class="n">yield</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="k">case</span> <span class="s">"bar"</span><span class="o">,</span> <span class="s">"foobar"</span> <span class="o">-&gt;</span> <span class="n">yield</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="k">default</span> <span class="o">-&gt;</span> <span class="n">yield</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">};</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">semaphore</span><span class="o">);</span>
+</code></pre></div></div>
+<p>The output of this snippet is “true,” thanks to the <code class="highlighter-rouge">yield</code> keyword.  Without using any <code class="highlighter-rouge">break</code> statements and without creating additional variables, we’ve assigned a conditional value to another variable using syntax similar to a lambda or anonymous class, without actually creating a lambda or anonymous class.  This new design of the switch statement makes it a valuable tool for making readable code which is easy to extend and modify.</p>
+
+<p>Some long-time Java developers may be hesitant to use a new keyword like <code class="highlighter-rouge">yield</code>, and for good reason.  The <code class="highlighter-rouge">yield</code> keyword is a hair’s width away from the <code class="highlighter-rouge">return</code> keyword in terms of functionality.  They perform very similar tasks, the main difference is when you would use them.  To truly elucidate the reason for the <code class="highlighter-rouge">yield</code> keyword, let’s rearrange the above example slightly:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">foo</span> <span class="o">=</span> <span class="s">"foo"</span><span class="o">;</span>
+<span class="kt">boolean</span> <span class="n">semaphore</span> <span class="o">=</span> <span class="k">switch</span><span class="o">(</span><span class="n">foo</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="s">"foo"</span> <span class="o">-&gt;</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="k">case</span> <span class="s">"bar"</span> <span class="o">-&gt;</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="k">default</span> <span class="o">-&gt;</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">sample</span> <span class="o">=</span> <span class="mi">100</span><span class="o">;</span>
+        <span class="n">yield</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+</code></pre></div></div>
+<p>The <code class="highlighter-rouge">default</code> case in the above example shows the situation where there are multiple steps to complete in this case.  To accommodate the passing of a value from the individual cases context back to the super-context of the <code class="highlighter-rouge">switch</code>, we must <code class="highlighter-rouge">yield</code> that value.  In the cases of <code class="highlighter-rouge">"foo"</code> and <code class="highlighter-rouge">"bar"</code> this step is unnecessary, as there is only one possible value to be yielded up to the super-context.</p>
+<h2 id="jep-355---text-blocks-preview">JEP 355 - Text Blocks (Preview)</h2>
+<p>This feature of Java 13 is more cosmetic than any other feature in this release.  Effectively, it replaces line-breaks in Java via the <code class="highlighter-rouge">+</code> sign with simple carriage returns.  To utilize text blocks, you must initialize a string with three quotation mark symbols.  This makes text blocks like</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">text</span> <span class="o">=</span> <span class="s">"This is a former example\n"</span> <span class="o">+</span>
+                <span class="s">" of multi-line text in\n"</span> <span class="o">+</span>
+                <span class="s">" pre-Java 13 times."</span>
+</code></pre></div></div>
+<p>capable of being re-written like this:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">text</span> <span class="o">=</span> <span class="s">"""
+                This is a modern text block.
+                There is no need for the newline character at all.
+                We just add a new line and it is processed automatically.
+                No more crazy escape sequences!
+"""</span><span class="o">;</span>
+</code></pre></div></div>
+<p>This syntax is great for writing application code in other languages like Scala and passing it to an interpreter object within your application.  Another great use case is embedding formatted HTML in your Java application.  The rules for text blocks are just like string literals.  You can concatenate text blocks with String literals, you can insert variables into String literals, you can even insert the single quote “ into text blocks without having to escape it; even escape sequences are supported if you wish to add them in!</p>
+<h2 id="jep-353---reimplement-the-legacy-socket-api">JEP 353 - Reimplement the Legacy Socket API</h2>
+<p>JEP 353 covers the new implementation of the Socket API.  To be more precise, an additional, more modern implementation of the Socket API (which was introduced in Java 1), has been added to the core libraries.  The old Socket API is available via a JDK system property and the <code class="highlighter-rouge">PlainSocketImpl</code> class (but not for long).</p>
+
+<p>The first, and in my opinion most important feature of the new implementation, is that sockets are polled in non-blocking mode and are accessed via an operation limited by a timeout by default.  Why is this important?  Effectively, it means you can perform operations on a Socket object without having to wait for the Socket to respond before making an additional operation on said Socket.  Consider an application that relies on external APIs for a subset of its functionality.  If you start the application with a blocking Socket, you will have to wait for your Socket operations to complete before continuing your application.  But if you were to initiate a connection to an API service using a non-blocking socket and store the result in a Future&lt;&gt; object, you can continue your application’s initialization steps without waiting for a response.  This is particularly convenient when decoupling your application’s initialization and third-party dependencies.</p>
+<h2 id="jep-350---dynamic-cds-archives">JEP 350 - Dynamic CDS Archives</h2>
+<p>This particular enhancement modifies the JRE more than anything; most Java developers will not notice this enhancement in their day to day development.  The origins of this JEP start in Java 10, with <a href="https://openjdk.java.net/jeps/310">JEP 310</a>.  Class-Data Sharing has been around since JDK 5, but it was codified as “Application Class-Data Sharing” for Java 10.  Effectively what happens is meta-data across a developer-specified list of classes are shared in an archive file.  This archive file is then loaded and referenced by the JVM.  If this archive file is built from 100 class files, you save the JVM a lot of time and energy by referencing just the one file.  This reduces memory footprint and application load times.</p>
+
+<p>So what feature has been added to CDS in Java 13?  Java 13 introduces dynamic archiving.  Before Java 13, making a CDS archive required the completion of several steps.  As outlined in JEP 350, the steps are:</p>
+<ol>
+  <li>Do one or more trial runs to create a class list</li>
+  <li>Dump an archive using the created class list</li>
+  <li>Run with the archive
+These steps are all achievable via java CLI options.  Depending on the size of the application, these commands may be difficult to run.  This is where Dynamic CDS comes in.  This enhancement performs step 1 at the end of your application’s execution, let’s say in your QA build process.  From here its just a matter of building your archive file and dropping it into a CI/CD pipeline for deployment.  The manual steps required to build the class list required to create the archive is completely gone with Dynamic CDS Archives.
+    <h2 id="jep-351---zgc-uncommit-unused-memory">JEP 351 - ZGC: Uncommit Unused Memory</h2>
+    <p>ZGC was a new garbage collector introduced to Java in Java 11.  It was designed to work on environments with massive compute capacity and memory requirements, significantly greater than desktop computing.  While other garbage collectors have their perks, ZGC is the best choice for applications with significant memory and compute requirements.</p>
+  </li>
+</ol>
+
+<p>ZGC is not without limits though.  Before Java 13, ZGC never returned memory to the OS without a restart.  This feature is common to most garbage collectors; most traditional GCs return memory to the OS by default as they were designed to run on commodity or even embedded hardware with severely restricted memory and compute requirements.  Not being able to return memory to the OS would have significant repercussions on application performance.  If we consider the origins of ZGC though, it is easy to see why this feature was not built-in.  If you have thousands of gigabytes of RAM installed on your host machine, you likely do not need to return it to the OS.  Regardless, this feature was added to ZGC in Java 13, making it an option for applications that do not always run on specialized, enterprise-level machines.</p>
+<h1 id="future-directions">Future Directions</h1>
+<p>Java 13 is the next chapter in the quest to make Java a viable functional language.  Since Oracle has taken over the development of Java, it has gradually evolved into a modern language, capable of keeping up with the hottest trends in application development.  Since Java 8, the language has steadily evolved into a discrete, easily readable, easily extensible language capable of keeping up with other languages like Python, Scala, and Kotlin.</p>
+
+<p>At the time of this post’s writing, Java 14 is scheduled to be released in March of 2020.  <a href="https://openjdk.java.net/jeps/352">JEP 352</a> is the only addition scheduled for <a href="https://openjdk.java.net/projects/jdk/14/">Java 14</a>, but that last will likely grow to include several more JEPs from the index before the end of 2019.</p>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">1</span>
+      </a>
+    </li>
+  
+    <li>
+      <a href="#2019">
+        <strong>2019</strong> <span class="taxonomy__count">9</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/hipaa-compliant-message-bus" rel="permalink">Building a HIPAA Compliant Message Bus with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  11 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">What is Solace?
+Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace Pu...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+  <section id="2019" class="taxonomy__section">
+    <h2 class="archive__subtitle">2019</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/creating-an-event-driven-jhipster-application-with-solace" rel="permalink">Creating an Event Driven jHipster Application with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on wh...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-well-architected-2020" rel="permalink">AWS Well-Architected 2020
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon USA has been working to lock in Well-Architected status in the North America region for the last six months.  By the end of 2019, Ippon USA will join I...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/java-13-release-features" rel="permalink">Java 13 Release Features
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, S...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/ippons-rva-war-tour" rel="permalink">Ippon’s RVA WAR Tour
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, an...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr" rel="permalink">Best Practices for Amazon EMR
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper c...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-3" rel="permalink">Using Swagger to Build Effective APIs Part 3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-2" rel="permalink">Using Swagger to Build Effective APIs Part 2
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-1" rel="permalink">Using Swagger to Build Effective APIs Part 1
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The rise of serverless computing and platform agnostic, app-based services use has forced the casual developer to learn proper API development, a task usuall...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/comparing-java-lts-releases" rel="permalink">Comparing Java LTS Releases
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  18 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The last 5 years have seen some rapid changes in the way new versions of the Java Development Kit is deployed and maintained.  Traditionally, new Java versio...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/dferguson992" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Dan Ferguson. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

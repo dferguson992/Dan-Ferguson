@@ -1,0 +1,885 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Using Swagger to Build Effective APIs Part 2 - Ferg in the Clouds</title>
+<meta name="description" content="This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will continue our dicussion with writing paths for your API and testing those paths using Swagger Hub.  ">
+
+
+  <meta name="author" content="Dan Ferguson">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ferg in the Clouds">
+<meta property="og:title" content="Using Swagger to Build Effective APIs Part 2">
+<meta property="og:url" content="http://localhost:4000/posts/using-swagger-to-build-effective-apis-part-2">
+
+
+  <meta property="og:description" content="This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will continue our dicussion with writing paths for your API and testing those paths using Swagger Hub.  ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-02-25T00:00:00-05:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/posts/using-swagger-to-build-effective-apis-part-2">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Dan Ferguson",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/ferg_in","https://www.linkedin.com/in/yourprofile"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ferg in the Clouds Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Ferg in the Clouds
+          <span class="site-subtitle">Dan's Blog</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/aboutme/">About Me</a>
+            </li><li class="masthead__menu-item">
+              <a href="/profexp/">Professional Experience</a>
+            </li><li class="masthead__menu-item">
+              <a href="/certs/">Certifications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/posts/">Blog Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/media/">Media</a>
+            </li><li class="masthead__menu-item">
+              <a href="/unprofesh/">Un-Professional</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/posts" itemprop="item"><span itemprop="name">Posts</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Using Swagger to Build Effective APIs Part 2</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/logo.png" alt="Dan Ferguson" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Ferguson</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Solutions Architect and the author of this blog.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">New York, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Using Swagger to Build Effective APIs Part 2</h1>
+    
+    <p>This post is a continuation <a href="https://blog.ippon.tech/using-swagger-to-build-effective-apis-pt1/">in a discussion</a> on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will continue our dicussion with writing paths for your API and testing those paths using Swagger Hub.</p>
+
+<h2 id="paths-sections">Paths Sections</h2>
+<p>The third and most important component to an API specification is the paths section.  Here is the meat and potatoes of the API, the definitions behind how it will be used by developers in the future.  Let’s look at a simple example of two paths this API could take for the exercise resource:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">paths</span><span class="pi">:</span>
+  <span class="s">/exercises</span><span class="pi">:</span>
+    <span class="na">summary</span><span class="pi">:</span> <span class="s">Returns a paginated list of exercises</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Returns a paginated list of exercises</span>
+    <span class="na">get</span><span class="pi">:</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">Exercise</span>
+      <span class="na">summary</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Sample</span><span class="nv"> </span><span class="s">GET</span><span class="nv"> </span><span class="s">operation</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">/exercises</span><span class="nv"> </span><span class="s">endpoint.'</span>
+      <span class="na">description</span><span class="pi">:</span> <span class="s1">'</span><span class="s">This</span><span class="nv"> </span><span class="s">operation,</span><span class="nv"> </span><span class="s">defined</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">noun</span><span class="nv"> </span><span class="s">"exercises"</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">verb</span><span class="nv"> </span><span class="s">"GET"</span><span class="nv"> </span><span class="s">implies</span><span class="nv"> </span><span class="s">we</span><span class="nv"> </span><span class="s">will</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">making</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">HTTP</span><span class="nv"> </span><span class="s">GET</span><span class="nv"> </span><span class="s">request</span><span class="nv"> </span><span class="s">against</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">API,</span><span class="nv"> </span><span class="s">will</span><span class="nv"> </span><span class="s">receive</span><span class="nv"> </span><span class="s">multiple</span><span class="nv"> </span><span class="s">Exercise</span><span class="nv"> </span><span class="s">objects</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">response.'</span>
+      <span class="na">operationId</span><span class="pi">:</span> <span class="s1">'</span><span class="s">getAllExercises'</span>
+      <span class="na">responses</span><span class="pi">:</span>
+        <span class="s1">'</span><span class="s">200'</span><span class="pi">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Successfully retrieved paginated list of all Exercise objects</span>
+          <span class="na">content</span><span class="pi">:</span>
+            <span class="s">application/json</span><span class="pi">:</span>
+              <span class="na">schema</span><span class="pi">:</span>
+                <span class="na">type</span><span class="pi">:</span> <span class="s">array</span>
+                <span class="na">items</span><span class="pi">:</span>
+                  <span class="s">$ref</span><span class="pi">:</span> <span class="s1">'</span><span class="s">#/components/schemas/Exercise'</span>
+        <span class="s1">'</span><span class="s">500'</span><span class="pi">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Server error prevented successful retrieval</span>
+  <span class="s">/exercises/{id}</span><span class="pi">:</span>
+    <span class="na">summary</span><span class="pi">:</span> <span class="s">Returns an exercise based on the ID passed</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Returns an exercise based on the ID passed</span>
+    <span class="na">get</span><span class="pi">:</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">Exercise ID</span>
+      <span class="na">summary</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Returns</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">exercise</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">ID</span><span class="nv"> </span><span class="s">passed"</span>
+      <span class="na">description</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Returns</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">exercise</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">ID</span><span class="nv"> </span><span class="s">passed"</span>
+      <span class="na">parameters</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">id</span>
+          <span class="na">in</span><span class="pi">:</span> <span class="s">path</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Exercise ID</span>
+          <span class="na">required</span><span class="pi">:</span> <span class="no">true</span>
+          <span class="na">schema</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">integer</span>
+            <span class="na">format</span><span class="pi">:</span> <span class="s">int64</span>
+      <span class="na">operationId</span><span class="pi">:</span> <span class="s1">'</span><span class="s">getExerciseByID'</span>
+      <span class="na">responses</span><span class="pi">:</span>
+        <span class="s1">'</span><span class="s">200'</span><span class="pi">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Successfully retrieved a single Exercise object</span>
+          <span class="na">content</span><span class="pi">:</span>
+            <span class="s">application/json</span><span class="pi">:</span>
+              <span class="na">schema</span><span class="pi">:</span>
+                <span class="s">$ref</span><span class="pi">:</span> <span class="s1">'</span><span class="s">#/components/schemas/Exercise'</span>
+  <span class="s">/exercises/exercise</span><span class="pi">:</span>
+    <span class="na">summary</span><span class="pi">:</span> <span class="s">POST a new exercise</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">POST a new exercise</span>
+    <span class="na">post</span><span class="pi">:</span>
+      <span class="na">tags</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">Exercise</span>
+      <span class="na">operationId</span><span class="pi">:</span> <span class="s1">'</span><span class="s">postExercise'</span>
+      <span class="na">summary</span><span class="pi">:</span> <span class="s2">"</span><span class="s">POST</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">new</span><span class="nv"> </span><span class="s">exercise"</span>
+      <span class="na">description</span><span class="pi">:</span> <span class="s2">"</span><span class="s">POST</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">new</span><span class="nv"> </span><span class="s">exercise"</span>
+      <span class="na">requestBody</span><span class="pi">:</span>
+        <span class="na">required</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">content</span><span class="pi">:</span>
+          <span class="s">application/json</span><span class="pi">:</span>
+            <span class="na">schema</span><span class="pi">:</span>
+              <span class="s">$ref</span><span class="pi">:</span> <span class="s1">'</span><span class="s">#/components/schemas/Exercise'</span>
+      <span class="na">responses</span><span class="pi">:</span>
+        <span class="s1">'</span><span class="s">202'</span><span class="pi">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Payload was accepted</span>
+          <span class="na">content</span><span class="pi">:</span>
+            <span class="s">application/json</span><span class="pi">:</span>
+              <span class="na">schema</span><span class="pi">:</span>
+                <span class="s">$ref</span><span class="pi">:</span> <span class="s1">'</span><span class="s">#/components/schemas/Exercise'</span>
+        <span class="s1">'</span><span class="s">400'</span><span class="pi">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Back-end was unavailable</span>
+</code></pre></div></div>
+<p>The example above shows two GET endpoints that define operations on the exercise resource defined in the components section of the specification.  You’ll notice for each endpoint we define an HTTP Method (at least one), any relevant parameters associated with that method request, and the expected responses that come from that request path are mapped to components with the <code class="highlighter-rouge">$ref</code> tag.</p>
+
+<p>Pathing is a complex topic in API development.  There are many things to consider when defining API paths, like HTTP Headers, HTTP Methods, endpoint names, response types, versions, etc.  For example, you will notice each API path I have specified is a noun.  This noun is either singular or plural, depending on the number of objects returned by the response definition.</p>
+
+<p>The only verbs in this API design are the HTTP verbs, which is as it should be.  Some developers may be tempted to say <code class="highlighter-rouge">http://www.myapi.com/getAllExercises</code>.  This is not good practice; behind the scenes, this operation is a <code class="highlighter-rouge">GET getAllExercises</code>, which is redundant.  Instead, define your API paths as nouns and use the HTTP operations as verbs.</p>
+
+<p>If you can concatenate the two and create a sensible phrase, you have successfully defined a logical endpoint like <code class="highlighter-rouge">POST exercise</code> or <code class="highlighter-rouge">GET exercises</code>.  The use of verbs to define REST API operations is a tricky business and is generally considered bad practice.  However, if you are defining a different kind of API, like SOAP or more generally RPC, this is good practice.  RPC APIs are beyond the scope of this post, but if you would like to do more reading, I would suggest <a href="https://www.smashingmagazine.com/2016/09/understanding-rest-and-rpc-for-http-apis/">this article</a>, which neatly defines the differences between REST APIs and RPC type APIs.</p>
+
+<p>Usually, APIs are written by architects, for developers.  This immediately implies a paradigm shift will be required in order to keep your API future proof from developer requests.  If you want to design your API so it is easily upgradeable, easily maintainable, and easily understood by both users and developers, check out these articles: <a href="https://hackernoon.com/restful-api-design-step-by-step-guide-2f2c9f9fcdbf">API Design</a> and <a href="https://hackernoon.com/restful-api-designing-guidelines-the-best-practices-60e1d954e7c9">API Best Practices</a>.</p>
+
+<h1 id="test-your-swagger-using-swagger-hub-tools">Test your Swagger using Swagger Hub tools</h1>
+<p>Once you’ve built your API Specification using the Swagger Editor, you have to test it.  By far, the easiest way you can test your API specification is to copy it from the Swagger Editor and paste it into Swagger Hub.  This will, of course, require you to sign-in to Swagger Hub and create a new API; but the ease of testing involved make the process well worth it.  Additionally, you can make any new API private on Swagger Hub, if you are concerned others may poach your API.</p>
+
+<p>Once you’ve pasted your API into the Swagger Hub, you’ll notice the UI will take on a very similar look and feel as the Swagger Editor.  They are not identical displays however; in fact, you may notice that Swagger Hub adds a server line for you.  This is what Swagger Hub added to the server section of my API</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Added by API Auto Mocking Plugin</span>
+  <span class="pi">-</span> <span class="na">description</span><span class="pi">:</span> <span class="s">SwaggerHub API Auto Mocking</span>
+    <span class="na">url</span><span class="pi">:</span> <span class="s">https://virtserver.swaggerhub.com/dferguson992/aspotr/1.0.0</span>
+</code></pre></div></div>
+<p>This is a virtual server used to mock requests to your API.  Your username, API name, and API Version number all define the URL of the mock server.  You cannot ping the server, but you can run curl commands against API endpoints hosted on the server.  These API endpoints are pulled straight from your specification and will send mock data to your endpoints so you can physically see the responses.  Furthermore, you are free to modify the mock data to fit any edge cases you may want to program into your application in the future.  It is important to note, this is just a sanity test designed to allow you to see the specified output of your API.  You should not use the mock endpoints to actually test your business logic.  The mock endpoint is created solely for the purpose of viewing and verifying the expected output.</p>
+
+<p>Let’s look at a few of the examples from the demo API:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-X</span> GET <span class="s2">"https://virtserver.swaggerhub.com/dferguson992/aspotr/1.0.0/exercises"</span> <span class="nt">-H</span> <span class="s2">"accept: application/json"</span>
+<span class="o">[</span> <span class="o">{</span>
+  <span class="s2">"id"</span> : 0,
+  <span class="s2">"sets"</span> : <span class="o">[</span> <span class="o">{</span>
+    <span class="s2">"id"</span> : 0,
+    <span class="s2">"exercise"</span> : <span class="o">{</span>
+      <span class="s2">"id"</span> : 0,
+      <span class="s2">"name"</span> : <span class="s2">"string"</span>,
+      <span class="s2">"description"</span> : <span class="s2">"string"</span>,
+      <span class="s2">"primaryMuscleGroupId"</span> : <span class="o">{</span>
+        <span class="s2">"id"</span> : 0,
+        <span class="s2">"name"</span> : <span class="s2">"string"</span>
+      <span class="o">}</span>,
+      <span class="s2">"movementModifier"</span> : <span class="s2">"isolation"</span>
+    <span class="o">}</span>,
+    <span class="s2">"repetitions"</span> : <span class="o">[</span> <span class="o">{</span>
+      <span class="s2">"id"</span> : 0,
+      <span class="s2">"weight"</span> : 0,
+      <span class="s2">"system"</span> : <span class="nb">true</span>,
+      <span class="s2">"repetitionModified"</span> : <span class="s2">"tempo"</span>
+    <span class="o">}</span> <span class="o">]</span>,
+    <span class="s2">"name"</span> : <span class="s2">"string"</span>
+  <span class="o">}</span> <span class="o">]</span>,
+  <span class="s2">"avgRestTime"</span> : 0
+<span class="o">}</span>
+<span class="nv">$ </span>curl <span class="nt">-X</span> GET <span class="s2">"https://virtserver.swaggerhub.com/dferguson992/aspotr/1.0.0/exercises/1"</span> <span class="nt">-H</span> <span class="s2">"accept: application/json"</span>
+<span class="o">{</span>
+  <span class="s2">"id"</span> : 0,
+  <span class="s2">"sets"</span> : <span class="o">[</span> <span class="o">{</span>
+    <span class="s2">"id"</span> : 0,
+    <span class="s2">"exercise"</span> : <span class="o">{</span>
+      <span class="s2">"id"</span> : 0,
+      <span class="s2">"name"</span> : <span class="s2">"string"</span>,
+      <span class="s2">"description"</span> : <span class="s2">"string"</span>,
+      <span class="s2">"primaryMuscleGroupId"</span> : <span class="o">{</span>
+        <span class="s2">"id"</span> : 0,
+        <span class="s2">"name"</span> : <span class="s2">"string"</span>
+      <span class="o">}</span>,
+      <span class="s2">"movementModifier"</span> : <span class="s2">"isolation"</span>
+    <span class="o">}</span>,
+    <span class="s2">"repetitions"</span> : <span class="o">[</span> <span class="o">{</span>
+      <span class="s2">"id"</span> : 0,
+      <span class="s2">"weight"</span> : 0,
+      <span class="s2">"system"</span> : <span class="nb">true</span>,
+      <span class="s2">"repetitionModified"</span> : <span class="s2">"tempo"</span>
+    <span class="o">}</span> <span class="o">]</span>,
+    <span class="s2">"name"</span> : <span class="s2">"string"</span>
+  <span class="o">}</span> <span class="o">]</span>,
+  <span class="s2">"avgRestTime"</span> : 0
+<span class="o">}</span>
+</code></pre></div></div>
+<p>As you can see, these two GET requests return basic Exercise objects.  This mocking allows us to view the exercises as they would be returned from the API.  This is important, as it allows us to easily define improved endpoints for future releases of the API.  Seeing the results of the endpoint requests, even if they are mocked, will always be more valuable than writing the specification and never seeing it in action until business logic is written.</p>
+
+<p>We can even modify the request body of the POST endpoint we defined earlier:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-X</span> POST <span class="s2">"https://virtserver.swaggerhub.com/dferguson992/aspotr/1.0.0/exercises/exercise"</span> <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="nt">-d</span> <span class="o">{</span><span class="s2">"id"</span>:1,<span class="s2">"sets"</span>:[<span class="o">{</span><span class="s2">"id"</span>:0,<span class="s2">"exercise"</span>:<span class="o">{</span><span class="s2">"id"</span>:0,<span class="s2">"name"</span>:<span class="s2">"stricription"</span>:<span class="s2">"string"</span>,<span class="s2">"primaryMuscleGroupId"</span>:<span class="o">{</span><span class="s2">"id"</span>:0,<span class="s2">"name"</span>:<span class="s2">"string"</span><span class="o">}</span>,<span class="s2">"movementModifier"</span>:<span class="s2">"isolation"</span><span class="o">}</span>,<span class="s2">"repetitions"</span>:[<span class="o">{</span><span class="s2">"id"</span>:0,<span class="s2">"weight"</span>:0,<span class="s2">"system"</span>:true,<span class="s2">"repetitionModified"</span>:<span class="s2">"tempo"</span><span class="o">}]</span>,<span class="s2">"name"</span>:<span class="s2">"string"</span><span class="o">}]</span>,<span class="s2">"avgRestTime"</span>:0<span class="o">}</span>
+<span class="o">{</span>
+  <span class="s2">"id"</span> : 0,
+  <span class="s2">"sets"</span> : <span class="o">[</span> <span class="o">{</span>
+    <span class="s2">"id"</span> : 0,
+    <span class="s2">"exercise"</span> : <span class="o">{</span>
+      <span class="s2">"id"</span> : 0,
+      <span class="s2">"name"</span> : <span class="s2">"string"</span>,
+      <span class="s2">"description"</span> : <span class="s2">"string"</span>,
+      <span class="s2">"primaryMuscleGroupId"</span> : <span class="o">{</span>
+        <span class="s2">"id"</span> : 0,
+        <span class="s2">"name"</span> : <span class="s2">"string"</span>
+      <span class="o">}</span>,
+      <span class="s2">"movementModifier"</span> : <span class="s2">"isolation"</span>
+    <span class="o">}</span>,
+    <span class="s2">"repetitions"</span> : <span class="o">[</span> <span class="o">{</span>
+      <span class="s2">"id"</span> : 0,
+      <span class="s2">"weight"</span> : 0,
+      <span class="s2">"system"</span> : <span class="nb">true</span>,
+      <span class="s2">"repetitionModified"</span> : <span class="s2">"tempo"</span>
+    <span class="o">}</span> <span class="o">]</span>,
+    <span class="s2">"name"</span> : <span class="s2">"string"</span>
+  <span class="o">}</span> <span class="o">]</span>,
+  <span class="s2">"avgRestTime"</span> : 0
+<span class="o">}</span>
+</code></pre></div></div>
+<p>We defined the payload as an exercise containing just default values for each field, and passed it in JSON to the curl statement under the <code class="highlighter-rouge">-d</code> flag.  As you can see, our API returned a sample exercise object that deviated from our payload.  It is difficult to see at first, but if you look closely you will see we passed an exercise with an id of “1” to the curl statment, and received an exercise with an id of “0” in the response body.  This is a short-coming inherent to mocking.  In our API specification, we may have intended our API to return the exact response we sent, but there is no way to emulate this behavior in a mock.  This is because REST APIs are stateful.  There is no way for us to emulate this intended behavior without designing business logic.  Situations like these are important to pay close attention to when mocking an API, as they may reveal flaws in your assumption about how your API will work.</p>
+
+<h1 id="summary">Summary</h1>
+<p>Swagger is a great toolset for anyone looking to develop an API.  For those of us looking to write APIs, you should always adhere to a common standard which will make your API usable.  That is why you should use the OAS 3.0.n specification for your API.  APIs that do not adhere to this design have the potential to be difficult to use and maintain.  Any tool that is difficult to maintain will not be used.</p>
+
+<p>Inversely, Swagger is a tool that is very easy to use, which is why I have developed this demo API using Swagger tools in the first place.  Some of the additional benefits of Swagger tools include their portability.  Swagger Hub will let you generate templated client and server code in nearly any language you want.  This allows you to rapidly prototype APIs for the future.</p>
+
+<p>For example, AWS API Gateway will generate all of the features of your OAS compliant API like models and routes, will help you test your API, and will even deploy your API in a serverless context using AWS Lambda to handle endpoint calls.  The only thing API Gateway needs to get started is a Swagger document.  Maven has a swagger plug-in which takes a definition YAML file and generates client models on the fly so you can rapidly prototype an application for your API.  If the API changes, you just update the definition file and your API code will change with it.  Swagger is the toolset for helping architects write APIs quickly, and OAS 3.0.n allows these APIs to be used by everyone.</p>
+
+<p>If something in this article piqued your interest and you would like more information on JHipster or the services we offer at Ippon USA we’d love to hear from you! Please contact us at contact@ippon.tech with your questions and inquiries.</p>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">1</span>
+      </a>
+    </li>
+  
+    <li>
+      <a href="#2019">
+        <strong>2019</strong> <span class="taxonomy__count">9</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/hipaa-compliant-message-bus" rel="permalink">Building a HIPAA Compliant Message Bus with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  11 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">What is Solace?
+Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace Pu...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+  <section id="2019" class="taxonomy__section">
+    <h2 class="archive__subtitle">2019</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/creating-an-event-driven-jhipster-application-with-solace" rel="permalink">Creating an Event Driven jHipster Application with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on wh...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-well-architected-2020" rel="permalink">AWS Well-Architected 2020
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon USA has been working to lock in Well-Architected status in the North America region for the last six months.  By the end of 2019, Ippon USA will join I...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/java-13-release-features" rel="permalink">Java 13 Release Features
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, S...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/ippons-rva-war-tour" rel="permalink">Ippon’s RVA WAR Tour
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, an...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr" rel="permalink">Best Practices for Amazon EMR
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper c...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-3" rel="permalink">Using Swagger to Build Effective APIs Part 3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-2" rel="permalink">Using Swagger to Build Effective APIs Part 2
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-1" rel="permalink">Using Swagger to Build Effective APIs Part 1
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The rise of serverless computing and platform agnostic, app-based services use has forced the casual developer to learn proper API development, a task usuall...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/comparing-java-lts-releases" rel="permalink">Comparing Java LTS Releases
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  18 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The last 5 years have seen some rapid changes in the way new versions of the Java Development Kit is deployed and maintained.  Traditionally, new Java versio...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/dferguson992" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Dan Ferguson. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

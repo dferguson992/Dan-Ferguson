@@ -1,0 +1,749 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Ippon’s RVA WAR Tour - Ferg in the Clouds</title>
+<meta name="description" content="Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, and I recently finished a week of conducting reviews on some of our best clients that are using AWS in some capacity.  This blog post is an account of that week and the lessons I learned.  ">
+
+
+  <meta name="author" content="Dan Ferguson">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ferg in the Clouds">
+<meta property="og:title" content="Ippon’s RVA WAR Tour">
+<meta property="og:url" content="http://localhost:4000/posts/ippons-rva-war-tour">
+
+
+  <meta property="og:description" content="Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, and I recently finished a week of conducting reviews on some of our best clients that are using AWS in some capacity.  This blog post is an account of that week and the lessons I learned.  ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-07-16T00:00:00-04:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/posts/ippons-rva-war-tour">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Dan Ferguson",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/ferg_in","https://www.linkedin.com/in/yourprofile"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ferg in the Clouds Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Ferg in the Clouds
+          <span class="site-subtitle">Dan's Blog</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/aboutme/">About Me</a>
+            </li><li class="masthead__menu-item">
+              <a href="/profexp/">Professional Experience</a>
+            </li><li class="masthead__menu-item">
+              <a href="/certs/">Certifications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/posts/">Blog Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/media/">Media</a>
+            </li><li class="masthead__menu-item">
+              <a href="/unprofesh/">Un-Professional</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/posts" itemprop="item"><span itemprop="name">Posts</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Ippon's RVA WAR Tour</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/logo.png" alt="Dan Ferguson" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Ferguson</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Solutions Architect and the author of this blog.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">New York, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Ippon's RVA WAR Tour</h1>
+    
+    <p>Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, and I recently finished a week of conducting reviews on some of our best clients that are using AWS in some capacity.  This blog post is an account of that week and the lessons I learned.</p>
+
+<h2 id="what-is-a-well-architected-review">What is a Well-Architected Review?</h2>
+<p>The Well-Architected Framework is a compilation of what AWS calls “tribal knowledge” which is focused on designing “well-architected” applications.  An application which is well-architected is, according to this framework, likely to perform very well under most circumstances as there have not been any identified risks within the applications architecture at that time.  If an application is well-architected, it adheres strongly to the principles and concepts outlined in the 5 pillars of the well-architected framework.
+<img src="https://volansys.com/wp-content/uploads/2019/03/VOLANSYS-Pillars-of-AWS-Well-Architected-new.png" alt="" />
+As you dig into the 5 Pillars, it becomes obvious how straightforward the well-architected status is.  The concepts covered in the well-architected review are common sense principles that identify resilient, efficient, and cost effective applications.</p>
+
+<h2 id="why-would-a-client-be-interested">Why Would a Client Be Interested?</h2>
+<p>AWS has built a very competitive sales program around the Well-Architected Framework.  This framework creates an engine for AWS Certified Solutions Architects to look at cloud workflows and aid in the process of identifying potential risks in the deployed workload.  These workloads could be on paper as a diagram, or they could have been deployed in a cloud environment for 10 years now; the exact deployment state does not matter.  The point of a Well-Architected Review (WAR) is to fix problems in workloads before they cost your business.</p>
+
+<p>The reason partner organizations, like Ippon, conduct these reviews is because we are a company which specializes in cloud technology.  Our consultants are certified AWS Solutions Architects, Developers, and DevOps Engineers; it is our job to stay current in the rapidly evolving cloud services space.  It is certainly possible to review your workload without our services, but unless your organization employs dedicated AWS Solutions Architects you will not have the benefit of an outside opinion with cloud deployment expertise on your workload.</p>
+
+<p>Additionally, by conducting a WAR on a mission-critical cloud workload, your AWS Account becomes eligible for a $5,000 service credit towards any remediation work which is flagged up by a first time review.  This incentive allows your company to pay for any critical remediation items which may have been identified by the WAR.</p>
+
+<h2 id="key-take-aways-from-a-week-of-reviews">Key Take-Aways from a Week of Reviews</h2>
+<p>I work in the New York Ippon office, but all of the reviews I conducted this week were based out of our Richmond delivery center.  I had the opportunity to meet face to face with clients whose workloads I had never been exposed to before.  As a result, I had been exposed to a vast range of workloads, configurations, and architectures in a very short period of time.  These are some of the key take-aways I recommend other Solutions Architects keep in mind when conducting their own reviews.</p>
+<ol>
+  <li>Cloud makes your architecture cleaner, no matter the size.</li>
+  <li>Early adopters will always have an uphill battle.</li>
+  <li>Cutting cost is one of the easiest remediation items to implement.</li>
+</ol>
+
+<h2 id="cloud-is-clean">Cloud is Clean</h2>
+<p>I had the opportunity this past week to conduct a WAR for a small AWS client.  The organization had about 30 - 40 people employed, and they provided a service isolated primarily to the eastern seaboard, though they are growing fast.  I was not surprised to see their workload on AWS was simple, efficient, and effective.  The workload was scalable and very easy to troubleshoot.  It was designed very well and frankly it fit the bill for what I expected of a smaller sized company.  A few days later, I visited one of our global clients.  On the way to the review, I had expected to wade through layers and layers of architectural diagrams, finding arrows pointing to decommissioned services, and all other manner of architectural nuance characterized by large organizations with a global presence.  I was pleasently surprised to find I was incorrect here.  The large, multi-million dollar global corporation had a very clean, efficient workload in AWS which was easy to understand, troubleshoot and review.  So where was the problem?  Why did I feel like something wasn’t adding up?</p>
+
+<p>It turns out, the problem was between my ears.  I had a pre-conceived notion about what factors create architectural complexity.  In one of my past lives, I used to work for a large bank as a Site-Reliability Engineer for several data centers.  I vividly remember looking at application flows and network diagrams, trying desperately to solve a production issue only to discover the architecture did not reflect the documentation.  I attributed this to the size of the company I was working with at the time.  This company was a global organization with thousands of servers in a single data center; dozens of data centers around the world.  There was so much to manage in the data center, it became impossible to keep our architecture risk free at all times, let alone keep the documentation up to date.  So if size didn’t determine architectural complexity, what did?</p>
+
+<p>The big factor which influences architectural complexity is the location of your architecture.  If your compute and storage are located in a data center, there is too much to manage from an operations standpoint to hope to keep your architecture clean and concise.  However, once you move to the cloud, it becomes very easy to seperate your applications logically.  This separation drastically reduces operations expenses and creates a clean environment for you application stack.  A clean environment is easier to troubleshoot, support, and scale.</p>
+
+<h2 id="uphill-battle">Uphill Battle</h2>
+<p>If you’ve been called “Cloud Evangelist” at your organization, it’s very likely there is a negative sentiment to cloud-based hosting.  As the “Cloud Evangelist,” you are one of a few employees that believes the cloud is the answer to your organization’s infrastructure problem.  Every new operations issue which arises confirms your belief in a cloud hosted future.  Every time you pay your data center fees, you grow more and more bitter that this very preventable expense is still an expense for your company.  Cloud Evanglists are usually the first people to promote a cloud migration in their company, and they usually experience the most resistance.</p>
+
+<p>In my experience this week, it became very obvious to me that many clients simply are not ready to adopt the cloud.  There are many reasons for this, I can only speculate specifics on a client-by-client basis; but I can surmise a few root causes.</p>
+
+<p>The first is fear of the unknown.  Organizations that view IT as a cost-center do not see the potential for IT to improve their business.  In those situations, you often have management and executive level employees that would rather maintain the status quo in the technology department.  This stability frees them to focus on their business.  The irony is, by ignoring IT and the incessant ramblings of the Cloud Evangelist, the executive is losing out on the chance to improve their IT department.</p>
+
+<p>The second is fear of lost ROI.  By adopting a cloud provider, you are admitting on some level that your data center costs are too high.  The cost of buying servers, buying network equipment, paying for rack space, and paying for the operational overhead is so astronimcally high, you would think most people would jump at the chance to cut costs.  But when you are a business that prides itself on lasting business partnerships, it may be difficult to justify terminating a contract for something you may not be convinced is worthwhile, especially if you have been paying millions of dollars a year to maintain those business partnerships.</p>
+
+<p>This past week made it obvious to me that companies always have a reason to not adopt a cloud based data center solution.  That is why the early adopter has the hardest time in their organization.  It takes a big rudder to stear a big ship.  A small rudder can stear a big ship too, but it will take a lot more time.</p>
+
+<h2 id="how-many-pennies-on-the-dollar">How Many Pennies on the Dollar?</h2>
+<p>There is no question, cloud services are cheaper than on-premises data centers.  The cost is literally pennies on the dollar for many services.  This feature of the cloud is what drives adoption.  Going into the reviews this week, I expected to see bills on par with mortgage payments.  Some clients even got their bills so low, they resembled credit card payments!  However, no matter how impressive the monthly AWS bill was, every client had the same question.  “How much am I paying within my organization, and I can I bring that cost down?”</p>
+
+<p>As your organization grows to use AWS services, your monthly bill can quickly become obfuscated by curious engineers spinning up and spinning down resources.  Some engineers probably even forget to spin down those resources at the end of the day, thus increasing the bill.  AWS offers powerful accelerated deployment services via push-to-deploy mechanisms which exist across many of their services.  The unfortunate drawback to this is your bill can grow faster than you realize without a clear reason why.</p>
+
+<p>The solution to this problem is simple, but it requires a dilligent architect to see it through.  By tagging your resources, you can generate reports in the Cost and &amp; Usage Explorer which are filtered by tags.  This allows you to discover the costs associated with all of your QA resource for example.  If you have resources which contribute to your monthly charge tagged “QA,” you can easily develop a report which shows all of these resources and how much they cost you that month.  From there, it’s very easy to isolate (and therefore shame) the developer that leaves all of their EC2 instances on over the weekend!  Check out this link on <a href="https://aws.amazon.com/answers/account-management/aws-tagging-strategies/">AWS recommended tagging strategies</a>.  A good tagging strategy will empower you to make more cost effective decisions regarding resource allocation.</p>
+
+<h2 id="going-forward">Going Forward</h2>
+<p>The reviews Ippon conducted this week taught me a lot about the Well-Architected Framework.  I’m very excited to take these lessons learned into future client reviews; we want to offer the best advice possible to all of our clients.  It is my belief these takeaways will help us, and any other Solutions Architect, to conduct helpful reviews which improve cloud workloads for all of our clients.</p>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">1</span>
+      </a>
+    </li>
+  
+    <li>
+      <a href="#2019">
+        <strong>2019</strong> <span class="taxonomy__count">9</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/hipaa-compliant-message-bus" rel="permalink">Building a HIPAA Compliant Message Bus with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  11 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">What is Solace?
+Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace Pu...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+  <section id="2019" class="taxonomy__section">
+    <h2 class="archive__subtitle">2019</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/creating-an-event-driven-jhipster-application-with-solace" rel="permalink">Creating an Event Driven jHipster Application with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on wh...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-well-architected-2020" rel="permalink">AWS Well-Architected 2020
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon USA has been working to lock in Well-Architected status in the North America region for the last six months.  By the end of 2019, Ippon USA will join I...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/java-13-release-features" rel="permalink">Java 13 Release Features
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, S...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/ippons-rva-war-tour" rel="permalink">Ippon’s RVA WAR Tour
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, an...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr" rel="permalink">Best Practices for Amazon EMR
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper c...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-3" rel="permalink">Using Swagger to Build Effective APIs Part 3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-2" rel="permalink">Using Swagger to Build Effective APIs Part 2
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-1" rel="permalink">Using Swagger to Build Effective APIs Part 1
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The rise of serverless computing and platform agnostic, app-based services use has forced the casual developer to learn proper API development, a task usuall...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/comparing-java-lts-releases" rel="permalink">Comparing Java LTS Releases
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  18 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The last 5 years have seen some rapid changes in the way new versions of the Java Development Kit is deployed and maintained.  Traditionally, new Java versio...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/dferguson992" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Dan Ferguson. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,13 @@
+main:
+  - title: "About Me"
+    url: /aboutme/
+  - title: "Professional Experience"
+    url: /profexp/
+  - title: "Certifications"
+    url: /certs/
+  - title: "Blog Posts"
+    url: /posts/
+  - title: "Media"
+    url: /media/
+  - title: "Un-Professional"
+    url: /unprofesh/

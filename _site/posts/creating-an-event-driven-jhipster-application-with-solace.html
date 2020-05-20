@@ -1,0 +1,822 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Creating an Event Driven jHipster Application with Solace - Ferg in the Clouds</title>
+<meta name="description" content="Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on which to send the event.  Typically Kafka is the first and last platform used by developers to achieve event-driven architectures, primarily because it has always been free and is relatively easy to setup.  However, Kafka, especially Confluent Kafka, is better suited as an event database due to its built in message log and replay capabilities.  But Kafka presents some difficulties in a production environment.  ">
+
+
+  <meta name="author" content="Dan Ferguson">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ferg in the Clouds">
+<meta property="og:title" content="Creating an Event Driven jHipster Application with Solace">
+<meta property="og:url" content="http://localhost:4000/posts/creating-an-event-driven-jhipster-application-with-solace">
+
+
+  <meta property="og:description" content="Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on which to send the event.  Typically Kafka is the first and last platform used by developers to achieve event-driven architectures, primarily because it has always been free and is relatively easy to setup.  However, Kafka, especially Confluent Kafka, is better suited as an event database due to its built in message log and replay capabilities.  But Kafka presents some difficulties in a production environment.  ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-12-18T00:00:00-05:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/posts/creating-an-event-driven-jhipster-application-with-solace">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Dan Ferguson",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/ferg_in","https://www.linkedin.com/in/yourprofile"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ferg in the Clouds Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Ferg in the Clouds
+          <span class="site-subtitle">Dan's Blog</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/aboutme/">About Me</a>
+            </li><li class="masthead__menu-item">
+              <a href="/profexp/">Professional Experience</a>
+            </li><li class="masthead__menu-item">
+              <a href="/certs/">Certifications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/posts/">Blog Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/media/">Media</a>
+            </li><li class="masthead__menu-item">
+              <a href="/unprofesh/">Un-Professional</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/posts" itemprop="item"><span itemprop="name">Posts</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Creating an Event Driven jHipster Application with Solace</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/logo.png" alt="Dan Ferguson" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Ferguson</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Solutions Architect and the author of this blog.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">New York, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Creating an Event Driven jHipster Application with Solace</h1>
+    
+    <p>Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on which to send the event.  Typically Kafka is the first and last platform used by developers to achieve event-driven architectures, primarily because it has always been free and is relatively easy to setup.  However, Kafka, especially Confluent Kafka, is better suited as an event database due to its built in message log and replay capabilities.  But Kafka presents some difficulties in a production environment.</p>
+
+<p>Maintaining a Kafka infrastructure requires very careful consideration and planning, especially if event ordering matters to your application.  For organizations that cannot afford a messaging operations team to maintain their message bus, either financially or operationally, an event driven architecture can be more of a nightmare than synchronous API calls.  This is where Solace shines.</p>
+
+<p>Solace is a message bus that got its start in the finance industry.  Originally, the product offering was restricted to hardware accelerated routers that would publish and subscribe small messages very quickly over a networks with varying performance in order.  To achieve this, the engineers at Solace built routers containing specialized NICs with a custom TCP stack built on them designed for extremely low latency messaging.  Because of the specialized nature of these routers, they were very expensive and only saw use in enterprise companies requiring ultra low-latency messaging like hedgefunds and banks.  With the advent of virtualization technologies and the maturation of cloud providers, its easy and inexpensive to deploy Solace routers anywhere in the world!</p>
+
+<p>Why is this so important?  As development paradigms shift towards event-driven architecture, it is becoming more crucial now more than ever to have reliable, scalable, low-cost, and operationally efficient message backbones to facilitate your applications event footprint.  But just how difficult is it to develop an event-driven application using Solace as a message bus?  Let’s try it out!  In this post, I will show you how to integrate jHipster with Solace to develop an event-driven jHipster web application.</p>
+
+<h1 id="provision-a-solace-router">Provision a Solace Router</h1>
+<p>First, navigate &amp; login to the <a href="https://console.solace.cloud/">Solace Cloud Console</a>.  Follow the prompts to create a “service,” be sure to specify free tier and AWS as the cloud provider.  Other cloud providers are offered, but being that AWS owns the majority of the market share and Ippon is an AWS Advanced Consulting Partner, we’re going to use AWS for this demo.  Select a region which supports the free tier of Solace in the Cloud (hint: US-East N.Virginia works).  Then, give a good name to your service.  Your screen should look like this:<img src="https://blog.ippon.tech/content/images/2019/12/Screen-Shot-2019-12-12-at-11.21.25-PM.png" alt="Screen-Shot-2019-12-12-at-11.21.25-PM" />Click the “Start Service” button and wait until your service is provisioned.</p>
+
+<p>Once your service is started, you should be redirected to a dashboard with tabs for “Status” and “Manage.” I won’t go into details regarding these tabs as that goes beyond the scope of this post.  Instead, navigate to the “Try Me!” tab.  Here you can see the publisher configuration is on the left side, while the subscriber configuration is on the right.  By clicking “Connect” on both sides, you will connect to the broker twice: once as a publisher and once as a subscriber.  Now you can follow the prompts to publish and subscribe to messages in this window.  Experiment with the topic settings in the “Topic” input box.  Notice how publishing a message on a topic you are not subscribing to will not show the message in the subscriber window.</p>
+
+<h4 id="solace-connections-fyi">Solace Connections FYI</h4>
+<p>Solace connections are just TCP connections.  When you click the “Connect” button in the “Try Me” tab, you are creating a TCP connection using the SMF protocal.  SMF is a proprietary message protocol developed by the engineers at Solace.</p>
+
+<h4 id="solace-topics-fyi">Solace Topics FYI</h4>
+<p>Topics are a well-established concept in messaging, and in the Solace world this is no different.  However, Solace imparts more structure around their topics than exists in other open source messaging solutions like RabbitMQ or Kafka.  In Solace, topics have levels seperated by the “/” character.  This allows you to partition your topics bery precisely along the levels specified.  For publishers, this is important as it allows the publisher to publish a very specific topic.</p>
+
+<p>This is also very important for subscribers.  Subscribers can subscribe to very specific events, or to a large set of wild-carded events.  For example, if the publisher sends a message on the topic <code class="highlighter-rouge">USER/CREATE/&lt;ID&gt;</code> where the ID field is the ID of the user created, the subscriber can subscribe to messages on the topic <code class="highlighter-rouge">USER/CREATE/&gt;</code>.  This topic represents all “create user” events pertaining to any user.  If we wanted all messages for all users, we could subscribe to <code class="highlighter-rouge">USER/*/&gt;</code>, or more succinctly <code class="highlighter-rouge">USER/&gt;</code>.  The <code class="highlighter-rouge">&gt;</code> character is a wildcard representing all unspecified levels of a topic beyond the specified level.  The <code class="highlighter-rouge">*</code> character is a wildcard representing any string of characters at that level.</p>
+
+<h1 id="build-your-app">Build your App</h1>
+<p>The Solace Cloud Console may be interesting for a little while, but it’s not hard to see how, by itself, this isn’t very useful.  How can you publish and subscribe programmatically within an application?  In this demo, we’ll start with a basic jHipster project.  The details of your application are irrelevant, but I would recommend starting with a Monolithic style application for the purposes of this demo.  While your jHipster project is being generated, navigate to the “Connect” tab in your Solace Cloud Console.  Select the “Solace Java API” drop-down and copy the appropriate API import statement which will changed if you use Maven or Gradle.</p>
+
+<p>After your project is generated, open the build.gradle file and paste the API reference into the appropriate location.  At the time of this writing, the current API reference is <code class="highlighter-rouge">compile("com.solacesystems:sol-jcsmp:10.2.0")</code>.  If you’re using Maven, drop the XML formatted reference into the appropriate section of your pom.xml file.  Be sure to run the <code class="highlighter-rouge">./gradlew</code> command to download this library into your project.  Once this is done, click “Next” in the Solace Cloud Console.
+<img src="https://blog.ippon.tech/content/images/2019/12/Screen-Shot-2019-12-12-at-11.45.33-PM.png" alt="Screen-Shot-2019-12-12-at-11.45.33-PM" /></p>
+
+<p>The full repository is <a href="https://github.com/dferguson992/solace-jhipster-demo">here on Github</a> (see bottom for full URL) for your personal enjoyment.  However, for brevity’s sake, I’ll outline the major code changes below.  Assuming you’ve modified the build.gradle file, create this service file:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">ippon</span><span class="o">.</span><span class="na">dferguson</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">com.solacesystems.jcsmp.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.transaction.annotation.Transactional</span><span class="o">;</span>
+
+<span class="nd">@Service</span>
+<span class="nd">@Transactional</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SolacePublisherService</span> <span class="o">{</span>
+
+    <span class="kd">final</span> <span class="n">JCSMPProperties</span> <span class="n">properties</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JCSMPProperties</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="n">JCSMPSession</span> <span class="n">session</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">SolacePublisherService</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">JCSMPException</span> <span class="o">{</span>
+        <span class="n">properties</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">JCSMPProperties</span><span class="o">.</span><span class="na">HOST</span><span class="o">,</span> <span class="s">""</span><span class="o">);</span>
+        <span class="n">properties</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">JCSMPProperties</span><span class="o">.</span><span class="na">USERNAME</span><span class="o">,</span> <span class="s">""</span><span class="o">);</span>
+        <span class="n">properties</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">JCSMPProperties</span><span class="o">.</span><span class="na">PASSWORD</span><span class="o">,</span> <span class="s">""</span><span class="o">);</span>
+        <span class="n">properties</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">JCSMPProperties</span><span class="o">.</span><span class="na">VPN_NAME</span><span class="o">,</span> <span class="s">""</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">connect</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">JCSMPException</span> <span class="o">{</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">JCSMPFactory</span><span class="o">.</span><span class="na">onlyInstance</span><span class="o">().</span><span class="na">createSession</span><span class="o">(</span><span class="n">properties</span><span class="o">);</span>
+        <span class="n">session</span><span class="o">.</span><span class="na">connect</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kt">boolean</span> <span class="nf">isOpen</span><span class="o">(){</span>
+        <span class="k">return</span> <span class="o">!</span><span class="n">session</span><span class="o">.</span><span class="na">isClosed</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">disconnect</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">session</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">session</span><span class="o">.</span><span class="na">isClosed</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">closeSession</span><span class="o">();</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">publish</span><span class="o">(</span><span class="n">String</span> <span class="n">payload</span><span class="o">,</span> <span class="n">String</span> <span class="n">publish_topic</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">JCSMPException</span> <span class="o">{</span>
+        <span class="n">XMLMessageProducer</span> <span class="n">prod</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">getMessageProducer</span><span class="o">(</span><span class="k">new</span> <span class="n">JCSMPStreamingPublishEventHandler</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">responseReceived</span><span class="o">(</span><span class="n">String</span> <span class="n">messageID</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Producer received response for msg: "</span> <span class="o">+</span> <span class="n">messageID</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handleError</span><span class="o">(</span><span class="n">String</span> <span class="n">messageID</span><span class="o">,</span> <span class="n">JCSMPException</span> <span class="n">e</span><span class="o">,</span> <span class="kt">long</span> <span class="n">timestamp</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">"Producer received error for msg: %s@%s - %s%n"</span><span class="o">,</span>
+                    <span class="n">messageID</span><span class="o">,</span><span class="n">timestamp</span><span class="o">,</span><span class="n">e</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+        <span class="kd">final</span> <span class="n">Topic</span> <span class="n">topic</span> <span class="o">=</span> <span class="n">JCSMPFactory</span><span class="o">.</span><span class="na">onlyInstance</span><span class="o">().</span><span class="na">createTopic</span><span class="o">(</span><span class="n">publish_topic</span><span class="o">);</span>
+        <span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">JCSMPFactory</span><span class="o">.</span><span class="na">onlyInstance</span><span class="o">().</span><span class="na">createMessage</span><span class="o">(</span><span class="n">TextMessage</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">msg</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">payload</span><span class="o">);</span>
+        <span class="n">prod</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">msg</span><span class="o">,</span><span class="n">topic</span><span class="o">);</span>
+        <span class="n">prod</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p>Most of the code here can be found in the <a href="https://solace.com/samples/solace-samples-java/publish-subscribe/">publish/subscribe Solace tutorial</a>.  The SolacePublisherService properties have been redacted for security reasons, but the connection details are auto-generated by the Solace Cloud Console and populated by the connection code snippets.</p>
+
+<p>This class file creates a Solace publisher service.  We don’t care about a subscriber at this time.  In this simplistic event driven application, we can assume the user is creating events and does not care about events being created at all.  In other words, the user is a publisher, publishing events via the application.  The application does not need a subscriber component at this time.  If it did though, the process for integrating a subscriber in your application would be very similar to integrating a publisher.</p>
+
+<p>Now that we have the service built and wired into the spring context built by jHipster, we need to tell our application to publish an event.  Open the UserService file and add this snippet to the bottom of the <code class="highlighter-rouge">createUser</code> method:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">try</span> <span class="o">{</span>
+    <span class="n">solacePublisherService</span><span class="o">.</span><span class="na">connect</span><span class="o">();</span>
+    <span class="n">solacePublisherService</span><span class="o">.</span><span class="na">publish</span><span class="o">(</span><span class="s">"WELCOME TO THE PLATFORM"</span><span class="o">,</span> <span class="s">"USER/CREATE/"</span> <span class="o">+</span> <span class="n">userDTO</span><span class="o">.</span><span class="na">getId</span><span class="o">());</span>
+    <span class="n">solacePublisherService</span><span class="o">.</span><span class="na">disconnect</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">JCSMPException</span> <span class="n">e</span><span class="o">){</span>
+    <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"Could not publish the User Create message!"</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p>Modify the constructor of the UserService file accordingly:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">final</span> <span class="n">SolacePublisherService</span> <span class="n">solacePublisherService</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="nf">UserService</span><span class="o">(</span><span class="n">UserRepository</span> <span class="n">userRepository</span><span class="o">,</span> <span class="n">PasswordEncoder</span> <span class="n">passwordEncoder</span><span class="o">,</span> <span class="n">AuthorityRepository</span> <span class="n">authorityRepository</span><span class="o">,</span> <span class="n">CacheManager</span> <span class="n">cacheManager</span><span class="o">,</span> <span class="n">SolacePublisherService</span> <span class="n">solacePublisherService</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">userRepository</span> <span class="o">=</span> <span class="n">userRepository</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">passwordEncoder</span> <span class="o">=</span> <span class="n">passwordEncoder</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">authorityRepository</span> <span class="o">=</span> <span class="n">authorityRepository</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">cacheManager</span> <span class="o">=</span> <span class="n">cacheManager</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">solacePublisherService</span> <span class="o">=</span> <span class="n">solacePublisherService</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="test-it-out">Test It Out</h1>
+<p>Now that we have our application code modified, let’s build and test our application using the Solace Cloud Console.</p>
+
+<p>Start by returning to the “Try Me!” tab in the Solace Cloud Console.  Connect to your Solace router as a subscriber and subscribe to the topic <code class="highlighter-rouge">USER/CREATE/&gt;</code>.</p>
+
+<p>Build the jHipster application as the Readme instructs: run <code class="highlighter-rouge">./gradlew</code> and <code class="highlighter-rouge">npm start</code>.  Once your jHipster application is built, log into the application as the admin (default username and password is admin/admin).  Then, navigate to the User Administration tab in the top-right corner and select the “User Management” button.  Select the “Create New User” button in the top-right corner, fill in the blanks, and click the button to create the user.</p>
+
+<p>Once the user is created in your app, return to the Solace Cloud Console’s “Try Me!” tab.  You should see a message pop up in the Solace Cloud Console similar to the following:<img src="https://blog.ippon.tech/content/images/2019/12/Screen-Shot-2019-12-17-at-9.40.20-PM.png" alt="Screen-Shot-2019-12-17-at-9.40.20-PM" />  Congratulations!  You’ve just sent an event over a message bus in response to an application event driven by a user’s behavior!</p>
+
+<p>This demo is a very simplistic example of developing an event-driven application.  The published message is not very helpful and the application only publishes one type of message.  To truly take advantage of an event-driven architecture, you could for example subscribe to a creation event and send a welcome e-mail to the new user.  Or if your application has an e-commerce component, you could publish and subscribe page views to help your data science team determine which products pique consumer interest.  The applications are virtually unlimited.  The only important aspect of event-driven application design are having atomic, consistent, independent and durable events for application components which are important to your business.</p>
+
+<h1 id="external-links">External Links</h1>
+<p>Github Repo - https://github.com/dferguson992/solace-jhipster-demo</p>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">1</span>
+      </a>
+    </li>
+  
+    <li>
+      <a href="#2019">
+        <strong>2019</strong> <span class="taxonomy__count">9</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/hipaa-compliant-message-bus" rel="permalink">Building a HIPAA Compliant Message Bus with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  11 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">What is Solace?
+Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace Pu...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+  <section id="2019" class="taxonomy__section">
+    <h2 class="archive__subtitle">2019</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/creating-an-event-driven-jhipster-application-with-solace" rel="permalink">Creating an Event Driven jHipster Application with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on wh...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-well-architected-2020" rel="permalink">AWS Well-Architected 2020
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon USA has been working to lock in Well-Architected status in the North America region for the last six months.  By the end of 2019, Ippon USA will join I...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/java-13-release-features" rel="permalink">Java 13 Release Features
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, S...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/ippons-rva-war-tour" rel="permalink">Ippon’s RVA WAR Tour
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, an...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr" rel="permalink">Best Practices for Amazon EMR
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper c...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-3" rel="permalink">Using Swagger to Build Effective APIs Part 3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-2" rel="permalink">Using Swagger to Build Effective APIs Part 2
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-1" rel="permalink">Using Swagger to Build Effective APIs Part 1
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The rise of serverless computing and platform agnostic, app-based services use has forced the casual developer to learn proper API development, a task usuall...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/comparing-java-lts-releases" rel="permalink">Comparing Java LTS Releases
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  18 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The last 5 years have seen some rapid changes in the way new versions of the Java Development Kit is deployed and maintained.  Traditionally, new Java versio...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/dferguson992" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Dan Ferguson. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

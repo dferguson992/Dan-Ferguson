@@ -1,0 +1,779 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Building a HIPAA Compliant Message Bus with Solace - Ferg in the Clouds</title>
+<meta name="description" content="What is Solace? Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace PubSub+ Advanced Event Broker that comes in hardware, software, and messaging as a service in your favorite public cloud.  ">
+
+
+  <meta name="author" content="Dan Ferguson">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ferg in the Clouds">
+<meta property="og:title" content="Building a HIPAA Compliant Message Bus with Solace">
+<meta property="og:url" content="http://localhost:4000/posts/hipaa-compliant-message-bus">
+
+
+  <meta property="og:description" content="What is Solace? Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace PubSub+ Advanced Event Broker that comes in hardware, software, and messaging as a service in your favorite public cloud.  ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2020-03-18T00:00:00-04:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/posts/hipaa-compliant-message-bus">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Dan Ferguson",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/ferg_in","https://www.linkedin.com/in/yourprofile"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ferg in the Clouds Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Ferg in the Clouds
+          <span class="site-subtitle">Dan's Blog</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/aboutme/">About Me</a>
+            </li><li class="masthead__menu-item">
+              <a href="/profexp/">Professional Experience</a>
+            </li><li class="masthead__menu-item">
+              <a href="/certs/">Certifications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/posts/">Blog Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/media/">Media</a>
+            </li><li class="masthead__menu-item">
+              <a href="/unprofesh/">Un-Professional</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/posts" itemprop="item"><span itemprop="name">Posts</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Building a HIPAA Compliant Message Bus with Solace</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/logo.png" alt="Dan Ferguson" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Ferguson</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Solutions Architect and the author of this blog.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">New York, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Building a HIPAA Compliant Message Bus with Solace</h1>
+    
+    <h2 id="what-is-solace">What is Solace?</h2>
+<p>Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace PubSub+ Advanced Event Broker that comes in hardware, software, and messaging as a service in your favorite public cloud.</p>
+
+<h2 id="cloud-native-solace">Cloud-Native Solace</h2>
+<p>In the last few years, Solace has begun investing heavily into cloud based messaging solutions. Using tools like the Solace Cloud Console, you can quickly provision redundant and secure virtual solace appliances in any cloud you choose. But Solace messaging isn’t just fast, it is reliable, extensible, and secure. Solace virtual routers can seamlessly be deployed as an HA pair in a single region and DR can be setup across regions to ensure availability constraints that your enterprise demands. Solace routers support nearly every major messaging protocol, the list of protocols not supported is shorter than list of protocols that are. Solace routers are also secure. Administrative access for a private cloud deployment is as secure as the EC2 instances in your Amazon console.
+<img src="https://blog.ippon.tech/content/images/2020/02/Solace-PubSub-Platform-Diagram-1.png" alt="" />
+All of these built-in features, coupled with native cloud deployments with a very generous free-tier, make Solace an obvious option for businesses outside the financial space.  Companies spend thousands of dollars and person-hours building reliable messaging deployments that are secure and cost-effective.  Now you can have those features at the click of a button thanks to the cloud.  (Check out my last article talking about exactly how easy it is to do this.)  But not every business vertical is convinced cloud-based solutions like Solace fit their needs.  One of those  business verticals is healthcare and insurance.  The real question for these verticals is around HIPAA.  In this article we’ll discuss what HIPAA is and why Solace is absolutely a viable choice for messaging in a HIPAA compliant environment.  By taking the time to properly configure your PubSub+ services, achieving HIPAA compliance with Solace is quite straightforward. I’ll show you how to get started in this article.</p>
+
+<h2 id="what-is-hipaa">What is HIPAA?</h2>
+<p>HIPAA, or Health Insurance Portability and Accountability Act, is a piece of legislation passed in 1996 that puts regulation around the security of Personal Health Information (PHI).  Health insurance organizations deal with PHI all the time, this is the very nature of an insurance claim.  In the 24 years since this legislation was made law, the digital world has changed drastically, but compliance requirements remain the same.  For a full list of HIPAA compliance requirements, check out this website.  The list of requirements are extensive, but they do boil down to the following short-list of absolute necessities.</p>
+<ol>
+  <li>Implement a means of access control. This not only means assigning a centrally-controlled unique username and PIN code for each user, but also establishing procedures to govern the release or disclosure of ePHI during an emergency.</li>
+  <li>Introduce activity logs and audit controls. The audit controls required under the technical safeguards are there to register attempted access to ePHI and record what is done with that data once it has been accessed</li>
+  <li>Enforce policies for the use/positioning of workstations.  Policies must be devised and implemented to restrict the use of workstations that have access to ePHI, to specify the protective surrounding of a workstation and govern how functions are to be performed on the workstations.</li>
+  <li>Enforce policies and procedures for mobile devices. If users are allowed to access ePHI from their mobile devices, policies must be devised and implemented to govern how ePHI is removed from the devices if the user leaves the organization or the device is re-used, sold, etc.</li>
+  <li>Conduct regular risk assessments. Among the Security Officer´s main tasks is the compilation of a risk assessment to identify every area in which ePHI is being used, and to determine all of the ways in which breaches of ePHI could occur.</li>
+  <li>Introducing a risk management policy. The risk assessment must be repeated at regular intervals with measures introduced to reduce the risks to an appropriate level. A sanctions policy for employees who fail to comply with HIPAA regulations must also be introduced.</li>
+  <li>Develop a contingency plan. In the event of an emergency, a contingency plan must be ready to enable the continuation of critical business processes while protecting the integrity of ePHI while an organization operates in emergency mode.</li>
+  <li>Restrict third-party access. It is vital to ensure ePHI is not accessed by unauthorized parent organizations and subcontractors, and that Business Associate Agreements are signed with business partners who will have access to ePHI.</li>
+</ol>
+
+<h2 id="assessment-assumptions">Assessment Assumptions</h2>
+<p>This article is about defining a HIPAA compliant Solace implementation for companies dealing with PHI.  Let’s define what a typical environment would look like for a company like this.</p>
+<ul>
+  <li>User login to applications is handled by a central authentication/authorization platform like LDAP or Active Directory.</li>
+  <li>Applications all have their own usernames for the various integrations they possess, but end user activity is still logged and tracked for audit and control purposes.</li>
+  <li>Datastores, third party integrations, and application integrations have a application-user level permissions.  A typical example would be grants to select data from a table in a database for a specific application.</li>
+  <li>The company bound to HIPAA compliance is presumed to have a secure network from within the physical premises of the company.  Remote logins are secured through IPSec, VPNs, or some other secure communication protocol.</li>
+  <li>Applications used by the organization are already HIPAA compliant.</li>
+  <li>The organization already has a HIPAA compliant cloud-adoption policy in place that honors the phyical requirements of a HIPAA compliant workspace.</li>
+  <li>The organization already has a HIPAA Risk Assessment &amp; Management Policy in place that can be applied to new services like PubSub+.</li>
+</ul>
+
+<p>This list of 5 assumptions about an organization trying to be HIPAA compliant is fairly general.  Federated user login, application activity logging, intelligent access controls around data, and secure networking are all standard requirements for any business that makes money from data.  PHI data and Insure-tech companies are no exception.  Given the above mentioned general settings for an organization, we will discuss how the required aspects of HIPAA can be honored in a Solace Cloud deployment.</p>
+<ul>
+  <li>TLS / encryption to secure PHI/PII data in transit)</li>
+  <li>Encrypted storage to secure PHI/PII data at rest</li>
+  <li>Fine-grained access controls to govern and ensure only authorized systems can publish data and can receive data</li>
+  <li>Auditing of changes to security configurations</li>
+</ul>
+
+<h2 id="technical-safeguards">Technical Safeguards</h2>
+<h3 id="implement-a-means-of-access-control">Implement a Means of Access Control</h3>
+<p>Access control in Solace is a built-in, out of the box component of Solace.  Access control on Solace are baked in down to the underlying operating system.  For cloud deployments however, the true HIPAA compliant access control comes from User Authentication/Authorization, ACLs, and Client-Profiles.
+Authenticating against a Solace appliance can be done a number of ways.  The simplest is with a username and password.  This is the default setting for free-tier deployments.  There are a number of other built-in authentication solutions used by Solace that are quite extensible; an entire series of blogs could be written on this topic alone.  Concerning HIPAA compliance, Solace integrates easily with LDAP.  By authorizing against LDAP, your Solace access controls have the same HIPAA compliance as your LDAP configuration.  Configuring LDAP to be HIPAA compliant is a well-established and well-documented process; it suffices to say that if your LDAP configuration is HIPAA compliant, your Solace configuration is HIPAA compliant.
+In addition to LDAP integration, Solace has some built-in configuration options that can supply fine-grained access control down to the topic level.  Like most messaging systems, Solace has Access-Control Lists.  ACLs in Solace define the topics a user can publish and subscribe to, without the user having to know ahead of time.<br />
+<img src="https://blog.ippon.tech/content/images/2020/02/Screen-Shot-2020-02-28-at-2.17.09-PM.png" alt="" />
+<img src="https://blog.ippon.tech/content/images/2020/02/Screen-Shot-2020-02-28-at-2.17.53-PM.png" alt="" />
+If the user attempts to pub/sub against a topic not on their ACL, an error will be thrown.  Additionally, Solace ACLs can enforce IP whitelists or blacklists.  This means a user is only allowed to pub/sub messages from a very specific network location.
+<img src="https://blog.ippon.tech/content/images/2020/02/Screen-Shot-2020-02-28-at-2.14.58-PM-1.png" alt="" />
+Typically, this is a physical location in an office or the end of an encrypted VPN tunnel.  This kind of control is not required by HIPAA, but it is a recommended step to take when trying to become HIPAA compliant.
+Another great feature of Solace that provides fine-grained, HIPAA compliant access control are client profiles.  Like the various methods of authentication to Solace, client profiles are an extensive topic in Solace configuration that require an in-depth knowledge of low-latency networking to fully grasp.  Typically, these settings are worth modifying as a workaround for upstream networking issues.  However, it’s worth noting some of the less specific features that could be configured in a HIPAA compliant environment.
+<img src="https://blog.ippon.tech/content/images/2020/02/Screen-Shot-2020-02-28-at-2.23.07-PM.png" alt="" />
+When configuring a client profile, it is important to remember that clients using this profile will be restricted to the actions and settings in that profile.  There are some client specific settings that can configured, but general usability is restricted at the profile level.  For example, if you never want a client to connect to a queue, you would not allow them to receive guaranteed messages.  If you wanted to specify a service level user that could only create bridged connections (connections between different Solace Message VPNs or Services), you would enable “Connect as a Bridge.”  If you only want to publish messages when there is an active subscriber receiving them, you would enable the “Reject Messages to Sender on No Subscription Match Discard” setting.  These are all standard, high-level settings that define the behavior for a set of clients using your Solace device.  HIPAA compliance comes in with the “Downgrade Connection to Plain Text” setting.  This is a setting you would immediately disable when configuring Solace.  Under no circumstances should you downgrade the encryption on a connection in a HIPAA compliant environment.  By disabling this setting, all users on that client profile will automatically follow this setting.</p>
+
+<h3 id="introduce-activity-logs-and-audit-controls">Introduce Activity Logs and Audit Controls</h3>
+<p>If you want to view logs on a Solace router, simply subscribe to the topic #LOG/&gt;.  This does require a small amount of configuration on the router side (see below), but once enabled, your configured log messages will be routed to the appropriate topic for consumption.<br />
+<img src="https://blog.ippon.tech/content/images/2020/03/Screen-Shot-2020-03-17-at-12.35.28-PM.png" alt="" />
+Instead of writing to log files, Solace will track activity by publishing messages to the internal logging topic #LOG.  By setting up a queue or an always-on consumer bound to the #LOG/&gt; topic, you will always have up to date logs for your app.  Furthermore, log messages are broken out by topic hierarchy.  This allows you to have very granular logging configurations across all of your consumers.  In short, Solace’s logging capabilities extends to meet your organization’s HIPAA requirements; you just may have to think outside of the box about acquiring those logs.  You no longer need to setup an FTP site or run a <code class="highlighter-rouge">tail -F logs/*</code>.  If you think about logs as messages, it becomes very easy to acquire logs in a scalable manner to achieve HIPAA compliance.</p>
+
+<h2 id="administrative-safeguards">Administrative Safeguards</h2>
+<h3 id="developing-a-contingency-plan">Developing a Contingency Plan</h3>
+<p>Solace PubSub+ appliances come with the pre-configured option of establishing highly available routing, with the option to add a disaster recovery node.  This triplet of appliances ensures always-on performance with no data loss in case of a disaster.</p>
+<h3 id="restricting-third-party-access">Restricting Third-Party Access</h3>
+<p>The rules governing third-party access to a PubSub+ service are as straightforward as restricting access to corporate e-mail.  Secure passwords and proper network configuration make PubSub+ services quite secure from third-party access.  This is true for any cloud deployment.  Consider AWS’s VPC construct.  By default, it secures resources access through security groups, route tables and network access control lists.  When deploying a Solace PubSub+ appliance inside a corporate VPC, your PubSub+ appliance is bound to the same access restrictions which protect all of your assets from third-party access.</p>
+
+<h2 id="final-thoughts-on-hipaa-compliance-with-solace">Final Thoughts on HIPAA Compliance with Solace</h2>
+<p>Solace is a HIPAA compliant messaging solution.  Solace appliances have always had this capability, even before the company released a cloud-native deployment of their messaging technology.  By taking the time to properly configure your PubSub+ services, achieving HIPAA compliance is quite straightforward.  Here’s a short-list of recommendations to get your organization started.  From here, use your organization’s specific requirements to ensure PubSub+ services will assist you in all your messaging needs.</p>
+
+<ul>
+  <li>Define a logging consumer that writes #LOG/&gt; messages to Splunk, or an Elasticsearch cluster.</li>
+  <li>Deploy your PubSub+ in an AWS VPC within a private subnet.  Allow routing between a primary and secondary appliance, with fail-over traffic going to the DR appliance in a different region.</li>
+  <li>Deploy a PubSub+ image or Virtual Machine into your private cloud and manage it completely independent of Solace and the Cloud Console.  (AWS has an AMI on the Marketplace that allows you to deploy a Solace PubSub+ appliance using the EC2 service for example.)</li>
+  <li>Impart failover best-practices into your environment.  In a triplicate deployment, the requirements are a little tricky.  Check out <a href="https://docs.solace.com/Configuring-and-Managing/Redundancy.htm">this document from Solace</a> that defines best practices for failover in a PubSub+ environment.</li>
+  <li>Establish a white-list of subnets that are permitted to connect to the appliances.  From there, determine which clients belong to which subnets and allocate topics they are permitted to publish and subscribe to using ACLs.</li>
+  <li>Apply a security layer to the Solace APIs that meets your organization’s security standards.  For example, this layer could publish all messages using your organization’s encryption policies.</li>
+</ul>
+
+<p>For more information on Solace’s PubSub+ service, or if you have a specific question, check out https://solace.community/.  This website is constantly monitored by Solace professionals looking to answer any question you may have.</p>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">1</span>
+      </a>
+    </li>
+  
+    <li>
+      <a href="#2019">
+        <strong>2019</strong> <span class="taxonomy__count">9</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/hipaa-compliant-message-bus" rel="permalink">Building a HIPAA Compliant Message Bus with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  11 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">What is Solace?
+Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace Pu...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+  <section id="2019" class="taxonomy__section">
+    <h2 class="archive__subtitle">2019</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/creating-an-event-driven-jhipster-application-with-solace" rel="permalink">Creating an Event Driven jHipster Application with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on wh...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-well-architected-2020" rel="permalink">AWS Well-Architected 2020
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon USA has been working to lock in Well-Architected status in the North America region for the last six months.  By the end of 2019, Ippon USA will join I...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/java-13-release-features" rel="permalink">Java 13 Release Features
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, S...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/ippons-rva-war-tour" rel="permalink">Ippon’s RVA WAR Tour
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, an...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr" rel="permalink">Best Practices for Amazon EMR
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper c...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-3" rel="permalink">Using Swagger to Build Effective APIs Part 3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-2" rel="permalink">Using Swagger to Build Effective APIs Part 2
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-1" rel="permalink">Using Swagger to Build Effective APIs Part 1
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The rise of serverless computing and platform agnostic, app-based services use has forced the casual developer to learn proper API development, a task usuall...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/comparing-java-lts-releases" rel="permalink">Comparing Java LTS Releases
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  18 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The last 5 years have seen some rapid changes in the way new versions of the Java Development Kit is deployed and maintained.  Traditionally, new Java versio...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/dferguson992" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Dan Ferguson. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,54 @@
+---
+layout: posts
+title: Ippon's RVA WAR Tour
+permalink: /posts/ippons-rva-war-tour
+published: true
+---
+
+Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, and I recently finished a week of conducting reviews on some of our best clients that are using AWS in some capacity.  This blog post is an account of that week and the lessons I learned.
+
+## What is a Well-Architected Review?
+The Well-Architected Framework is a compilation of what AWS calls "tribal knowledge" which is focused on designing "well-architected" applications.  An application which is well-architected is, according to this framework, likely to perform very well under most circumstances as there have not been any identified risks within the applications architecture at that time.  If an application is well-architected, it adheres strongly to the principles and concepts outlined in the 5 pillars of the well-architected framework.
+![](https://volansys.com/wp-content/uploads/2019/03/VOLANSYS-Pillars-of-AWS-Well-Architected-new.png)
+As you dig into the 5 Pillars, it becomes obvious how straightforward the well-architected status is.  The concepts covered in the well-architected review are common sense principles that identify resilient, efficient, and cost effective applications.
+
+## Why Would a Client Be Interested?
+AWS has built a very competitive sales program around the Well-Architected Framework.  This framework creates an engine for AWS Certified Solutions Architects to look at cloud workflows and aid in the process of identifying potential risks in the deployed workload.  These workloads could be on paper as a diagram, or they could have been deployed in a cloud environment for 10 years now; the exact deployment state does not matter.  The point of a Well-Architected Review (WAR) is to fix problems in workloads before they cost your business.
+
+The reason partner organizations, like Ippon, conduct these reviews is because we are a company which specializes in cloud technology.  Our consultants are certified AWS Solutions Architects, Developers, and DevOps Engineers; it is our job to stay current in the rapidly evolving cloud services space.  It is certainly possible to review your workload without our services, but unless your organization employs dedicated AWS Solutions Architects you will not have the benefit of an outside opinion with cloud deployment expertise on your workload.
+
+Additionally, by conducting a WAR on a mission-critical cloud workload, your AWS Account becomes eligible for a $5,000 service credit towards any remediation work which is flagged up by a first time review.  This incentive allows your company to pay for any critical remediation items which may have been identified by the WAR.
+
+## Key Take-Aways from a Week of Reviews
+I work in the New York Ippon office, but all of the reviews I conducted this week were based out of our Richmond delivery center.  I had the opportunity to meet face to face with clients whose workloads I had never been exposed to before.  As a result, I had been exposed to a vast range of workloads, configurations, and architectures in a very short period of time.  These are some of the key take-aways I recommend other Solutions Architects keep in mind when conducting their own reviews.
+1. Cloud makes your architecture cleaner, no matter the size.
+2. Early adopters will always have an uphill battle.
+3. Cutting cost is one of the easiest remediation items to implement.
+
+## Cloud is Clean
+I had the opportunity this past week to conduct a WAR for a small AWS client.  The organization had about 30 - 40 people employed, and they provided a service isolated primarily to the eastern seaboard, though they are growing fast.  I was not surprised to see their workload on AWS was simple, efficient, and effective.  The workload was scalable and very easy to troubleshoot.  It was designed very well and frankly it fit the bill for what I expected of a smaller sized company.  A few days later, I visited one of our global clients.  On the way to the review, I had expected to wade through layers and layers of architectural diagrams, finding arrows pointing to decommissioned services, and all other manner of architectural nuance characterized by large organizations with a global presence.  I was pleasently surprised to find I was incorrect here.  The large, multi-million dollar global corporation had a very clean, efficient workload in AWS which was easy to understand, troubleshoot and review.  So where was the problem?  Why did I feel like something wasn't adding up?
+
+It turns out, the problem was between my ears.  I had a pre-conceived notion about what factors create architectural complexity.  In one of my past lives, I used to work for a large bank as a Site-Reliability Engineer for several data centers.  I vividly remember looking at application flows and network diagrams, trying desperately to solve a production issue only to discover the architecture did not reflect the documentation.  I attributed this to the size of the company I was working with at the time.  This company was a global organization with thousands of servers in a single data center; dozens of data centers around the world.  There was so much to manage in the data center, it became impossible to keep our architecture risk free at all times, let alone keep the documentation up to date.  So if size didn't determine architectural complexity, what did?
+
+The big factor which influences architectural complexity is the location of your architecture.  If your compute and storage are located in a data center, there is too much to manage from an operations standpoint to hope to keep your architecture clean and concise.  However, once you move to the cloud, it becomes very easy to seperate your applications logically.  This separation drastically reduces operations expenses and creates a clean environment for you application stack.  A clean environment is easier to troubleshoot, support, and scale.
+
+## Uphill Battle
+If you've been called "Cloud Evangelist" at your organization, it's very likely there is a negative sentiment to cloud-based hosting.  As the "Cloud Evangelist," you are one of a few employees that believes the cloud is the answer to your organization's infrastructure problem.  Every new operations issue which arises confirms your belief in a cloud hosted future.  Every time you pay your data center fees, you grow more and more bitter that this very preventable expense is still an expense for your company.  Cloud Evanglists are usually the first people to promote a cloud migration in their company, and they usually experience the most resistance.
+
+In my experience this week, it became very obvious to me that many clients simply are not ready to adopt the cloud.  There are many reasons for this, I can only speculate specifics on a client-by-client basis; but I can surmise a few root causes.
+
+The first is fear of the unknown.  Organizations that view IT as a cost-center do not see the potential for IT to improve their business.  In those situations, you often have management and executive level employees that would rather maintain the status quo in the technology department.  This stability frees them to focus on their business.  The irony is, by ignoring IT and the incessant ramblings of the Cloud Evangelist, the executive is losing out on the chance to improve their IT department.  
+
+The second is fear of lost ROI.  By adopting a cloud provider, you are admitting on some level that your data center costs are too high.  The cost of buying servers, buying network equipment, paying for rack space, and paying for the operational overhead is so astronimcally high, you would think most people would jump at the chance to cut costs.  But when you are a business that prides itself on lasting business partnerships, it may be difficult to justify terminating a contract for something you may not be convinced is worthwhile, especially if you have been paying millions of dollars a year to maintain those business partnerships.
+
+This past week made it obvious to me that companies always have a reason to not adopt a cloud based data center solution.  That is why the early adopter has the hardest time in their organization.  It takes a big rudder to stear a big ship.  A small rudder can stear a big ship too, but it will take a lot more time.
+
+## How Many Pennies on the Dollar?
+There is no question, cloud services are cheaper than on-premises data centers.  The cost is literally pennies on the dollar for many services.  This feature of the cloud is what drives adoption.  Going into the reviews this week, I expected to see bills on par with mortgage payments.  Some clients even got their bills so low, they resembled credit card payments!  However, no matter how impressive the monthly AWS bill was, every client had the same question.  "How much am I paying within my organization, and I can I bring that cost down?"
+
+As your organization grows to use AWS services, your monthly bill can quickly become obfuscated by curious engineers spinning up and spinning down resources.  Some engineers probably even forget to spin down those resources at the end of the day, thus increasing the bill.  AWS offers powerful accelerated deployment services via push-to-deploy mechanisms which exist across many of their services.  The unfortunate drawback to this is your bill can grow faster than you realize without a clear reason why.
+
+The solution to this problem is simple, but it requires a dilligent architect to see it through.  By tagging your resources, you can generate reports in the Cost and & Usage Explorer which are filtered by tags.  This allows you to discover the costs associated with all of your QA resource for example.  If you have resources which contribute to your monthly charge tagged "QA," you can easily develop a report which shows all of these resources and how much they cost you that month.  From there, it's very easy to isolate (and therefore shame) the developer that leaves all of their EC2 instances on over the weekend!  Check out this link on [AWS recommended tagging strategies](https://aws.amazon.com/answers/account-management/aws-tagging-strategies/).  A good tagging strategy will empower you to make more cost effective decisions regarding resource allocation.
+
+## Going Forward
+The reviews Ippon conducted this week taught me a lot about the Well-Architected Framework.  I'm very excited to take these lessons learned into future client reviews; we want to offer the best advice possible to all of our clients.  It is my belief these takeaways will help us, and any other Solutions Architect, to conduct helpful reviews which improve cloud workloads for all of our clients.

@@ -1,0 +1,846 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Using Swagger to Build Effective APIs Part 3 - Ferg in the Clouds</title>
+<meta name="description" content="This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will continue our dicussion with adding security to your API and testing your security configurations using Swagger Hub.  ">
+
+
+  <meta name="author" content="Dan Ferguson">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ferg in the Clouds">
+<meta property="og:title" content="Using Swagger to Build Effective APIs Part 3">
+<meta property="og:url" content="http://localhost:4000/posts/using-swagger-to-build-effective-apis-part-3">
+
+
+  <meta property="og:description" content="This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will continue our dicussion with adding security to your API and testing your security configurations using Swagger Hub.  ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-04-29T00:00:00-04:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/posts/using-swagger-to-build-effective-apis-part-3">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Dan Ferguson",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/ferg_in","https://www.linkedin.com/in/yourprofile"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ferg in the Clouds Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Ferg in the Clouds
+          <span class="site-subtitle">Dan's Blog</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/aboutme/">About Me</a>
+            </li><li class="masthead__menu-item">
+              <a href="/profexp/">Professional Experience</a>
+            </li><li class="masthead__menu-item">
+              <a href="/certs/">Certifications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/posts/">Blog Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/media/">Media</a>
+            </li><li class="masthead__menu-item">
+              <a href="/unprofesh/">Un-Professional</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/posts" itemprop="item"><span itemprop="name">Posts</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Using Swagger to Build Effective APIs Part 3</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/logo.png" alt="Dan Ferguson" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Ferguson</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Solutions Architect and the author of this blog.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">New York, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Using Swagger to Build Effective APIs Part 3</h1>
+    
+    <p>This post is a continuation <a href="https://blog.ippon.tech/using-swagger-to-build-effective-apis-pt2/">in a discussion</a> on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will continue our dicussion with adding security to your API and testing your security configurations using Swagger Hub.</p>
+
+<h2 id="security-schemes">Security Schemes</h2>
+<p>Recall from the first post in this discussion the section on schemas to describe our API models.  These schemas lived under the components section of an OAS 3.0 compliant API.  Security schemes are deployed in the same way.  Using OAS 3.0 notation, we can define multiple security schemes underneath the component section of your API.  Once you’ve defined your security schemes, you apply these schemes using the <code class="highlighter-rouge">security</code> tag, either at the root of your API, or against individual paths.  The nesting quality of the security tag allows you to customize access to your API in a very deterministic and detailed way.<br />
+    Additionally, some security schemes come with customizable “scopes” (think read or write, admin or guest) which we can apply to our API and endpoints in the same way.  This provides for more granular security across our API.  We’ll explore exactly what I mean using the workout API from the previous posts; but first, let’s discuss the different OAS 3.0 supported security paradigms and how we can “scope” them to API paths and apply roles to our security.</p>
+
+<h3 id="basic-authentication">Basic Authentication</h3>
+<p>Basic Authentication is the most primitive authentication scheme available to you.  If you’re familiar with the HTTP protocol, you’ll know this scheme is built straight into HTTP using the “Authorization” header.  The username and password are concatenated with a “:” and are converted into their base-64 encoding.  The resulting mish-mosh of characters, along with the “Basic” specifier, is your authorization token.  There’s not much else to discuss here, especially as it applies to OAS 3.0.<br />
+    Defining Basic Authentication in your security schemes takes the form</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">components</span><span class="pi">:</span>
+    <span class="na">securitySchemes</span><span class="pi">:</span>
+        <span class="na">basicAuth</span><span class="pi">:</span>     <span class="c1"># &lt;-- arbitrary name for the security scheme</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s">http</span>
+          <span class="na">scheme</span><span class="pi">:</span> <span class="s">basic</span>
+</code></pre></div></div>
+<p>If you were to employ Basic Authentication against an endpoint, it would take the form</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">paths</span><span class="pi">:</span>
+  <span class="s">/something</span><span class="pi">:</span>
+    <span class="na">get</span><span class="pi">:</span>
+      <span class="na">security</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">basicAuth:[]</span>
+</code></pre></div></div>
+<p>Please notice two important things here.  First, the security tag mentions <code class="highlighter-rouge">basicAuth</code> as a scheme.  This is not a keyword, nor does OAS 3.0 recognize this string as being Basic Authentication.  The only reason the string <code class="highlighter-rouge">basicAuth</code> is associated with Basic Authentication is because of how it is defined above in the security schemes section.  Within the <code class="highlighter-rouge">basicAuth</code> tag we define <code class="highlighter-rouge">scheme: basic</code> as the scheme.  The scheme key is how you truly specify which authentication scheme you are employing; the name of the scheme is irrelevant, and it serves only to identify that scheme for future use in your API.
+    The second important detail to notice in this example is the square brackets after the <code class="highlighter-rouge">basicAuth</code> under the security tag.  This is semantically required by OAS 3.0 to support the “scoping” of authentication schemes.  Because Basic Authentication is so simple, we do not have to worry about scopes when using it.  That is why the square brackets are empty.  We will see scopes being used in more detail later in this post, but for now it is important to recognize where they are used and why this notation exist.</p>
+
+<h3 id="bearer-authentication">Bearer Authentication</h3>
+<p>Bearer Authentication is a token-based HTTP scheme which similarly employs the Authorization HTTP header.  This scheme works similarly to the Basic Authentication scheme, except instead of “Basic <code class="highlighter-rouge">base64 encoded username:password</code>” being passed to the Authorization header, the string “Bearer <code class="highlighter-rouge">token</code>” is passed to the Authorization header.  This token is usually disseminated to users in an e-mail after they have confirmed their intent to use your API, or after they have paid for a service plan.  You can specify the use of Bearer Authentication in your API using the OAS 3.0 notation below.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">components</span><span class="pi">:</span>
+  <span class="na">securitySchemes</span><span class="pi">:</span>
+    <span class="na">bearerAuth</span><span class="pi">:</span>            <span class="c1"># arbitrary name for the security scheme</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">http</span>
+      <span class="na">scheme</span><span class="pi">:</span> <span class="s">bearer</span>
+      <span class="na">bearerFormat</span><span class="pi">:</span> <span class="s">JWT</span>    <span class="c1"># optional, arbitrary value for documentation purposes</span>
+<span class="na">paths</span><span class="pi">:</span>
+  <span class="s">/something</span><span class="pi">:</span>
+    <span class="na">get</span><span class="pi">:</span>
+      <span class="na">security</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">bearerAuth</span><span class="pi">:</span> <span class="pi">[]</span>
+</code></pre></div></div>
+<p>Notice again the scheme name serves only as an identifier for the scheme later on when applied to an endpoint.  Additionally, this scheme has no scope, and so therefore has empty square brackets when it is employed as a security scheme against an endpoint.</p>
+
+<h3 id="api-keys">API Keys</h3>
+<p>Think of API Key authentication schemes as a more extensible Bearer Authentication scheme.  Where Bearer Authentication is passed via the request header only, API Keys can be passed in the request body, the request header, or as a cookie.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 1) Define the key name and location</span>
+<span class="na">components</span><span class="pi">:</span>
+  <span class="na">securitySchemes</span><span class="pi">:</span>
+    <span class="na">ApiKeyAuth</span><span class="pi">:</span>        <span class="c1"># arbitrary name for the security scheme</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">apiKey</span>
+      <span class="na">in</span><span class="pi">:</span> <span class="s">header</span>       <span class="c1"># can be "header", "query" or "cookie"</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">X-API-KEY</span>  <span class="c1"># name of the header, query parameter or cookie</span>
+<span class="c1"># 2) Apply the API key globally to all operations</span>
+<span class="na">security</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">ApiKeyAuth</span><span class="pi">:</span> <span class="pi">[]</span>     <span class="c1"># use the same name as under securitySchemes</span>
+</code></pre></div></div>
+<p>As was the case with Basic and Bearer Authentication, API Keys do not have API based scopes, hence the square brackets.  This makes sense because API Keys are traditionally provisioned from the APIs backend.  The backend logic which provisions these API keys will keep track of permissions associated with the keys.  Therefore, keeping track of key permissions via scopes at the API layer is not only redundant, but could be completely wrong.  There’s no way your API can reflect in its specification the permissions associated with a backend generated key.  If we consider an API Key a glorified username and password or a bearer token, this logic applies transitively to Basic and Bearer Authentication schemes.  In short, the empty brackets defining scope are reserved for our last scheme, OAuth2.</p>
+
+<h3 id="oauth2-connect">OAuth2 Connect</h3>
+<p>The below ASCII art taken from the <a href="https://tools.ietf.org/html/rfc6749">OAuth 2.0 RFC</a> succinctly summarizes the basic idea behind how OAuth 2.0 will authorize access to a resource.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+--------+                               +---------------+
+|        |--(A)- Authorization Request -&gt;|   Resource    |
+|        |                               |     Owner     |
+|        |&lt;-(B)-- Authorization Grant ---|               |
+|        |                               +---------------+
+|        |
+|        |                               +---------------+
+|        |--(C)-- Authorization Grant --&gt;| Authorization |
+| Client |                               |     Server    |
+|        |&lt;-(D)----- Access Token -------|               |
+|        |                               +---------------+
+|        |
+|        |                               +---------------+
+|        |--(E)----- Access Token ------&gt;|    Resource   |
+|        |                               |     Server    |
+|        |&lt;-(F)--- Protected Resource ---|               |
++--------+                               +---------------+
+</code></pre></div></div>
+<p>OAuth 2.0 is widely regarded as the standard for authorization.  It is a complex paradigm whose details are beyond the scope of this article.  For more information, check out the <a href="https://oauth.net/2/">OAuth 2.0</a> information page.<br />
+    A quick summary of OAuth2 as it applies to OAS 3.0 requires the understanding of grant types, referred to as flows in Swagger notation.  These flows define actions which a seperate authentication server will authorize against your API.  This decouples authorization from your API.  OAS 3.0 has supports several OAuth2.0 flows, each flow having its own purpose and sub-key API specifications.  For a detailed look at how OAuth2.0 is specified using OAS 3.0, I strongly recommend <a href="https://swagger.io/docs/specification/authentication/oauth2/">checking the documentation</a>.  This article is about using Swagger tools to secure your API, not about the finer points of OAuth2.0.
+    It is worth mentioning that OAuth2 schemes utilize scopes with Swagger development.  When defining your OAuth2 scheme in your API, you simultaneously define scopes</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">components</span><span class="pi">:</span>
+  <span class="na">securitySchemes</span><span class="pi">:</span>
+    <span class="na">oAuthSample</span><span class="pi">:</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">oauth2</span>
+      <span class="na">flows</span><span class="pi">:</span>
+        <span class="na">implicit</span><span class="pi">:</span>
+          <span class="na">authorizationUrl</span><span class="pi">:</span> <span class="s">https://api.example.com/oauth2/authorize</span>
+          <span class="na">scopes</span><span class="pi">:</span>
+            <span class="na">read_pets</span><span class="pi">:</span> <span class="s">read pets in your account</span>
+            <span class="na">write_pets</span><span class="pi">:</span> <span class="s">modify pets in your account</span>
+<span class="na">paths</span><span class="pi">:</span>
+  <span class="s">/pets/{petId}</span><span class="pi">:</span>
+    <span class="na">patch</span><span class="pi">:</span>
+      <span class="na">summary</span><span class="pi">:</span> <span class="s">Updates a pet in the store</span>
+      <span class="na">security</span><span class="pi">:</span> 
+        <span class="pi">-</span> <span class="na">oAuthSample</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">write_pets</span><span class="pi">]</span>
+</code></pre></div></div>
+<p>From the above example, you can see we’ve defined two scopes which boil down to read and write access for users.  We’ve applied the “write” scope to the <code class="highlighter-rouge">/pets/{petId}</code> endpoint, indicating the use of this endpoint is reserved for those users with “write_pets” authorizations.  This is the power of scopes in Swagger API development; they let us lock down whole APIs or individual endpoints based on very customizable access settings.</p>
+
+<h2 id="securing-your-security">Securing your Security</h2>
+<p>It is worth noting Basic, Bearer, and API Key Authentication are easily reversible or spoofable.  By inspecting packets, you can easily hijack API Keys or Bearer Tokens.  With Basic Authentication, you can even reverse engineer usernames and password.  These schemes should always be employed over an encrypted channel like HTTPS.  By using SSL/TLS encryption, your request headers, cookies, and query strings will be encrypted, thus keeping your authorization keys secure when using the API.</p>
+
+<h2 id="deploying-your-secure-api">Deploying your Secure API</h2>
+<p>When you have finishing locking down your API endpoints using the described authorization methods, you can very easily generate stubbed server methods.  For example, I added Basic Authentication to one of the methods in the API example from previous posts on this topic and exported the stubbed server in Spring.  The YAML for that GET method was</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">paths</span><span class="pi">:</span>
+  <span class="s">/exercises</span><span class="pi">:</span>
+    <span class="na">summary</span><span class="pi">:</span> <span class="s">Returns a paginated list of exercises</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Returns a paginated list of exercises</span>
+    <span class="na">get</span><span class="pi">:</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">Exercise</span>
+      <span class="na">security</span><span class="pi">:</span> 
+      <span class="pi">-</span> <span class="na">BasicAuth</span><span class="pi">:</span> <span class="pi">[]</span>
+    <span class="na">summary</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Sample</span><span class="nv"> </span><span class="s">GET</span><span class="nv"> </span><span class="s">operation</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">/exercises</span><span class="nv"> </span><span class="s">endpoint.'</span>
+      <span class="na">description</span><span class="pi">:</span> <span class="s1">'</span><span class="s">This</span><span class="nv"> </span><span class="s">operation,</span><span class="nv"> </span><span class="s">defined</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">noun</span><span class="nv"> </span><span class="s">"exercises"</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">verb</span><span class="nv"> </span><span class="s">"GET"</span><span class="nv"> </span><span class="s">implies</span><span class="nv"> </span><span class="s">we</span><span class="nv"> </span><span class="s">will</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">making</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">HTTP</span><span class="nv"> </span><span class="s">GET</span><span class="nv"> </span><span class="s">request</span><span class="nv"> </span><span class="s">against</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">API,</span><span class="nv"> </span><span class="s">will</span><span class="nv"> </span><span class="s">receive</span><span class="nv"> </span><span class="s">multiple</span><span class="nv"> </span><span class="s">Exercise</span><span class="nv"> </span><span class="s">objects</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">response.'</span>
+    <span class="na">operationId</span><span class="pi">:</span> <span class="s1">'</span><span class="s">getAllExercises'</span>
+    <span class="na">responses</span><span class="pi">:</span>
+        <span class="s1">'</span><span class="s">200'</span><span class="pi">:</span>
+            <span class="na">description</span><span class="pi">:</span> <span class="s">Successfully retrieved paginated list of all Exercise objects</span>
+            <span class="na">content</span><span class="pi">:</span>
+                <span class="s">application/json</span><span class="pi">:</span>
+                <span class="na">schema</span><span class="pi">:</span>
+                    <span class="na">type</span><span class="pi">:</span> <span class="s">array</span>
+                    <span class="na">items</span><span class="pi">:</span>
+                        <span class="s">$ref</span><span class="pi">:</span> <span class="s1">'</span><span class="s">#/components/schemas/Exercise'</span>
+        <span class="s1">'</span><span class="s">401'</span><span class="pi">:</span>
+            <span class="s">$ref</span><span class="pi">:</span> <span class="s1">'</span><span class="s">#/components/responses/UnauthorizedError'</span>
+        <span class="s1">'</span><span class="s">500'</span><span class="pi">:</span>
+            <span class="na">description</span><span class="pi">:</span> <span class="s">Server error prevented successful retrieval</span>
+</code></pre></div></div>
+<p>The resulting stubbed method generated by Swagger for me was</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@ApiOperation</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"Sample GET operation on the /exercises endpoint."</span><span class="o">,</span> <span class="n">nickname</span> <span class="o">=</span> <span class="s">"getAllExercises"</span><span class="o">,</span> <span class="n">notes</span> <span class="o">=</span> <span class="s">"This operation, defined by the noun \"exercises\" and the verb \"GET\" implies we will be making an HTTP GET request against the API, will receive multiple Exercise objects in the response."</span><span class="o">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">Exercise</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">responseContainer</span> <span class="o">=</span> <span class="s">"List"</span><span class="o">,</span> <span class="n">authorizations</span> <span class="o">=</span> <span class="o">{</span>
+<span class="nd">@Authorization</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"BasicAuth"</span><span class="o">)</span>    <span class="o">},</span> <span class="n">tags</span><span class="o">={</span> <span class="s">"Exercise"</span><span class="o">,</span> <span class="o">})</span>
+<span class="nd">@ApiResponses</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="o">{</span> 
+    <span class="nd">@ApiResponse</span><span class="o">(</span><span class="n">code</span> <span class="o">=</span> <span class="mi">200</span><span class="o">,</span> <span class="n">message</span> <span class="o">=</span> <span class="s">"Successfully retrieved paginated list of all Exercise objects"</span><span class="o">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">Exercise</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">responseContainer</span> <span class="o">=</span> <span class="s">"List"</span><span class="o">),</span>
+    <span class="nd">@ApiResponse</span><span class="o">(</span><span class="n">code</span> <span class="o">=</span> <span class="mi">401</span><span class="o">,</span> <span class="n">message</span> <span class="o">=</span> <span class="s">"Authentication information is missing or invalid"</span><span class="o">),</span>
+    <span class="nd">@ApiResponse</span><span class="o">(</span><span class="n">code</span> <span class="o">=</span> <span class="mi">500</span><span class="o">,</span> <span class="n">message</span> <span class="o">=</span> <span class="s">"Server error prevented successful retrieval"</span><span class="o">)</span> <span class="o">})</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"/exercises"</span><span class="o">,</span> <span class="n">produces</span> <span class="o">=</span> <span class="o">{</span> <span class="s">"application/json"</span> <span class="o">},</span> <span class="n">method</span> <span class="o">=</span> <span class="n">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">)</span>
+<span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Exercise</span><span class="o">&gt;&gt;</span> <span class="nf">getAllExercises</span><span class="o">();</span>
+</code></pre></div></div>
+<p>Why is this useful?  Well, as an architect designing an API to be written by an application developer, it may not be instantly clear which methods will be secured and how.  But when authoring APIs using Swagger Hub and generating stubbed server code in this way, it is nearly impossible to introduce developer errors into your code base.  Each stubbed method is fully annotated; the functionality is explicitly defined in a way that is easily recognized by architects and developers alike.
+    Furthermore, as an application developer looking to utilize this API endpoint, it is easy to see from the documentation page how to utilize this method.  By clicking on the “lock” icon next to the method I am trying to use, I can quickly see how I need to write my application to utilize this API endpoint.
+    <img src="https://blog.ippon.tech/content/images/2019/04/Using-Swagger-to-Build-Effective-APIs-Part-3.png" alt="Using-Swagger-to-Build-Effective-APIs-Part-3" /></p>
+
+<h2 id="summary">Summary</h2>
+<p>Swagger Hub is a powerful and concise tool used to author explicit and well-defined APIs.  When used properly, Swagger can bridge the gap between architects, back-end developers, and front-end developers by creating an organic, dynamic representation of your API should be used.  Furthermore, the code-generation tools used by Swagger allow it to generate code agnostic APIs that fit your business use case and your developer’s skill sets.  Furthermore, Swagger’s strong adherence to the Open-API Specification 3.0 allows your API to be well-understood across all industries.  No matter how amazing a product is, if it is difficult to use, no one will use it.  Tools like Swagger help keep APIs easy to understand, easy to use, easy to document, and easy to develop against.</p>
+
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">1</span>
+      </a>
+    </li>
+  
+    <li>
+      <a href="#2019">
+        <strong>2019</strong> <span class="taxonomy__count">9</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/hipaa-compliant-message-bus" rel="permalink">Building a HIPAA Compliant Message Bus with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  11 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">What is Solace?
+Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace Pu...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+  <section id="2019" class="taxonomy__section">
+    <h2 class="archive__subtitle">2019</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/creating-an-event-driven-jhipster-application-with-solace" rel="permalink">Creating an Event Driven jHipster Application with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on wh...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-well-architected-2020" rel="permalink">AWS Well-Architected 2020
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon USA has been working to lock in Well-Architected status in the North America region for the last six months.  By the end of 2019, Ippon USA will join I...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/java-13-release-features" rel="permalink">Java 13 Release Features
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, S...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/ippons-rva-war-tour" rel="permalink">Ippon’s RVA WAR Tour
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, an...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr" rel="permalink">Best Practices for Amazon EMR
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper c...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-3" rel="permalink">Using Swagger to Build Effective APIs Part 3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-2" rel="permalink">Using Swagger to Build Effective APIs Part 2
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-1" rel="permalink">Using Swagger to Build Effective APIs Part 1
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The rise of serverless computing and platform agnostic, app-based services use has forced the casual developer to learn proper API development, a task usuall...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/comparing-java-lts-releases" rel="permalink">Comparing Java LTS Releases
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  18 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The last 5 years have seen some rapid changes in the way new versions of the Java Development Kit is deployed and maintained.  Traditionally, new Java versio...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/dferguson992" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Dan Ferguson. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

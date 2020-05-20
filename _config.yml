@@ -1,8 +1,95 @@
-theme: jekyll-theme-time-machine
-#remote_theme: olakara/JekyllMetro
-
+####################
+# PROJECT SETTINGS #
+####################
+remote_theme: "mmistakes/minimal-mistakes@4.19.2"
 exclude: [Gemfile, Gemfile.lock, README.md, .gitignore, CNAME, LICENSE]
-
+include: ["_pages", "_layouts"]
+minimal_mistakes_skin    : "dark"
+timezone: America/New_York
 plugins:
   - jekyll-gist
+  - jekyll-feed
   - jekyll-twitter-plugin
+  - jekyll-include-cache
+
+#################
+# SITE SETTINGS #
+#################
+locale: "en-US"
+title: "Ferg in the Clouds"
+subtitle: "Dan's Blog"
+name: "Dan Ferguson"
+description: "A site collecting my professional accomplishments, lessons learned, and thoughts I've found interesting over the years."
+url: "https://www.danferguson-blog.com/"
+repository: "dferguson992/Dan-Ferguson"
+#logo: "/assets/images/88x88.png"
+breadcrumbs: true
+search: true
+search_full_content: true
+logo: "/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg"
+
+#########################
+# SOCIAL MEDIA SETTINGS #
+#########################
+social:
+  links:
+    - "https://twitter.com/ferg_in"
+    - "https://www.linkedin.com/in/yourprofile"
+
+###############
+# COLLECTIONS #
+###############
+collections:
+  awsportfolio:
+    output: true
+    permalink: /:collection/:path/
+
+
+################
+# AUTHORS LIST #
+################
+author:
+  name     : "Dan Ferguson"
+  avatar   : "/assets/images/logo.png"
+  bio      : "Solutions Architect and the author of this blog."
+  location : "New York, USA"
+  links:
+    - label: "Twitter"
+      icon: "fas fa-fw fa-link"
+      url: "https://twitter.com/ferg_in"
+
+###############
+# SITE FOOTER #
+###############
+footer:
+  links:
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/ferg_in"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/dferguson992"
+
+############
+# DEFAULTS #
+############
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: true
+      share: true
+      related: true
+  # _portfolio
+  - scope:
+      path: ""
+      type: awsportfolio
+    values:
+      layout: single
+      author_profile: false
+      share: true
