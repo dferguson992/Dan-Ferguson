@@ -1,0 +1,879 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Snowflake External Functions - Ferg in the Clouds</title>
+<meta name="description" content="Snowflake is a cloud-based data warehousing company.  They specialize in provisioning on-demand compute and elastic storage for data warehousing applications on a pay-per-use pricing model.  In recent years they’ve dominated the cloud data-warehouse industry.  Recently they announced a few new product features.  In this post, we’re going to discuss one of those features, External Functions. External Functions External Functions in Snowflake are functions hosted on a different platform.  What does this mean?  Let’s break it down. Functions are pieces of Javascript or SQL code that execute in your data warehouse.  The code itself is written by developers and is intended to add features and functionality to your data warehouse, beyond the traditional SQL commands that Snowflake already offers.  External Functions are similar, except they are not hosted on Snowflake, and do not execute within the context of your data warehouse.  Instead, they are hosted elsewhere, accessed via an HTTP endpoint, and computed using third-party compute resources.  When making a call to a function, the value is computed using Snowflake’s compute resources.  External Function values are computed using external resources, and the results are returned via HTTP. For example, if you had access to an external service that mapped zip codes to cities, the typical approach to leveraging this service without external functions would be to import the keys and values of cities and zip-codes to a table and then query that table.  Then you could select cities from the zipcode_to_city table where the zip-code is some value.  For example,    Create the table zipcode_to_city.   Create an ETL pipeline that batch loads zipcode_to_city with the zipcodes and cities from your source system.   Automate this ETL pipeline to update the table when/if changes happen.   Run select city from zipcode_to_city where zip = &#39;11102&#39;;.   (Optional) Create a function that replaces this query for you in other queries. This is standard practice for integrating databases with external systems.  The problem here is you have to maintain an ETL pipeline to keep your downstream database up to date.  Additionally, you have another table to query which could impact the performance of queries downstream.  Now imagine having to do this for several external systems of record beyond just zip code - city mappings.  It’s easy to see how this could get complicated quickly. Now, with external functions, you can create the zipcode_to_city_external_function and get the same data as you would have if you imported the table.  The only difference now is that instead of importing a table to Snowflake, you import only the data you need, when you need it, via HTTPS.  After configuring your function (which we’ll see how to do later), you can call it in SQL like this:     select zipcode_to_city_external_function(zipcode);          The function zipcode_to_city_external_function replaces the typical call to your reference table and the value is imported and used in the rest of your SQL statement.  Now you don’t have to maintain a reference table of zip-code – city mappings because you’ve offloaded that functionality to a third-party service.     Creating an External Function     I’m not going to spend time breaking out syntax associated with creating an external function.  If you want to know the syntax options, check the Snowflake documentation associated with External Functions.  Instead, I’ll go through the typical workflow required to create and use an External Function on AWS.      Configure access to external function (IAM)   Create an API Integration object in Snowflake (API Gateway)   Create the External Function     Configuring Access     The first thing to do is to create the IAM assets used by Snowflake to make calls to your AWS hosted function.  Due to limitations we’ll explore later in this post, Snowflake must call API Gateway.  As a result, we’ll create this policy where you’ll specify your own hosting API ARN:     {  &quot;Version&quot;: &quot;2012-10-17&quot;,  &quot;Statement&quot;: [      {          &quot;Sid&quot;: &quot;VisualEditor0&quot;,          &quot;Effect&quot;: &quot;Allow&quot;,          &quot;Action&quot;: [              &quot;apigateway:DELETE&quot;,              &quot;apigateway:PUT&quot;,              &quot;apigateway:PATCH&quot;,              &quot;apigateway:POST&quot;,              &quot;apigateway:GET&quot;          ],          &quot;Resource&quot;: &quot;&lt;API GATEWAY ARN&gt;&quot;      }  ] }          Now we create a role.  This role is a little different from your typical role as it requires access from a third party.  Note in the image below we select “Another AWS account” as the trusted entity, specifying a dummy ID in the external ID field.  When creating this role, specify your own account’s Account ID in the Account ID field.  After you’ve done this, add the policy we created above to this role and complete the role creation. !     Configure Snowflake-Side Access     What we’ve done to this point is setup a templated access to AWS from Snowflake on the AWS side.  There’s still some configuration we need to create on the Snowflake side before we can go back and finalize our AWS configuration. External Functions require a Snowflake construct called an API Integration.  These constructs are logical endpoints within Snowflake that store references to external APIs.  See the below code snippet for more information.     CREATE API INTEGRATION IF NOT EXISTS external_integration  API_PROVIDER = aws_api_gateway  API_AWS_ROLE_ARN = &#39;&lt;ARN OF ROLE CREATED BEFORE&gt;&#39;  ENABLED = TRUE  API_ALLOWED_PREFIXES = (&#39;&lt;API GATEWAY DEPLOYMENT URL&#39;)  COMMENT = &#39;AWS Hosted API Gateway Integration&#39;  ;          By running this snippet and replacing the values referenced with the role we created earlier and the API deployment that hosts your external function, we have created an API Integration.  This is important for configuring access for the external function later on. Once this stage is created, we need to gather some information about it.  Run the following command and be sure to save the output for your reference:     DESC API INTEGRATION external_integration;          The output for this command shows some meta-data about the API Integration that we specified when creating the integration.  It also includes two important fields called API_AWS_EXTERNAL_ID and API_AWS_IAM_USER_ARN.  We’ll need these fields to continue configuring access  to AWS.  Record these field values and return to the AWS IAM console.     Modifying AWS Access     Go back to AWS IAM and modify the role we created at the beginning of this post.  Navigate to the “Trust Relationship” tab and edit this policy.  When you open the policy document, it should look something like this:     {   &quot;Version&quot;: &quot;2012-10-17&quot;,   &quot;Statement&quot;: [  {    &quot;Effect&quot;: &quot;Allow&quot;,    &quot;Principal&quot;: {      &quot;AWS&quot;: &quot;&lt;YOUR ACCOUNBT ID&gt;&quot;    },    &quot;Action&quot;: &quot;sts:AssumeRole&quot;,    &quot;Condition&quot;: {      &quot;StringEquals&quot;: {        &quot;sts:ExternalId&quot;: &quot;&lt;DUMMY ID&gt;&quot;      }    }  }   ] }          Replace the ARN containing your Account ID with the API_AWS_IAM_USER_ARN value from the previous query we ran in Snowflake.  Then replace the Dummy ID with the API_AWS_EXTERNAL_ID from the previous query.  The results should look like the following:     {   &quot;Version&quot;: &quot;2012-10-17&quot;,   &quot;Statement&quot;: [  {    &quot;Effect&quot;: &quot;Allow&quot;,    &quot;Principal&quot;: {      &quot;AWS&quot;: &quot;&lt;API_AWS_IAM_USER_ARN&gt;&quot;    },    &quot;Action&quot;: &quot;sts:AssumeRole&quot;,    &quot;Condition&quot;: {      &quot;StringEquals&quot;: {        &quot;sts:ExternalId&quot;: &quot;&lt;API_AWS_EXTERNAL_ID&gt;&quot;      }    }  }   ] }          What this does is allow the Snowflake asset you created with the API_AWS_EXTERNAL_ID and API_AWS_IAM_USER_ARN specified to assume the role with the permissions we gave it.  Based on this blog post, that means access to call an API Gateway endpoint.  If you modify this role to have new policies though, that means you will grant this third party service all of those new policies.  For more details,  check out this how-to guide published by Snowflake on this topic.     Creating the External Function     After all that back and forth, this is the easy part.  Following the syntax for an External Function, we should be sending something like the following to Snowflake:     CREATE OR REPLACE SECURE EXTERNAL FUNCTION zipcode_to_city_external_function (zipcode VARCHAR)   RETURNS VARCHAR   NOT NULL   RETURNS NULL ON NULL INPUT   VOLATILE   COMMENT = &#39;Returns a city for the given zip-code.&#39;   API_INTEGRATION = external_integration   HEADERS = (&#39;content-type&#39; = &#39;application/json&#39;)   AS &#39;&lt;API ENDPOINT URL&gt;&#39;   ;          Notice how we specify an empty list of parameters, a return type, and the API Integration object we created earlier.  The API Integration object allows this external function to assume the role we specified, giving Snowflake the ability to query API Gateway as an external service. To use this external function, all we have to do is call our function like you would any User-Defined Function:     SELECT zipcode_to_city_external_function(&quot;11102&quot;);          The results of this function call will vary based on the back-end implementation, but in my demo the result is:     ZIPCODE_TO_CITY_EXTERNAL_FUNCTION(&quot;11102&quot;) ASTORIA      The following is the backend implementation for this endpoint: ```nodejs exports.handler = async (event) =&gt; {      ">
+
+
+  <meta name="author" content="Dan Ferguson">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ferg in the Clouds">
+<meta property="og:title" content="Snowflake External Functions">
+<meta property="og:url" content="http://localhost:4000/posts/snowflake-external-functions">
+
+
+  <meta property="og:description" content="Snowflake is a cloud-based data warehousing company.  They specialize in provisioning on-demand compute and elastic storage for data warehousing applications on a pay-per-use pricing model.  In recent years they’ve dominated the cloud data-warehouse industry.  Recently they announced a few new product features.  In this post, we’re going to discuss one of those features, External Functions. External Functions External Functions in Snowflake are functions hosted on a different platform.  What does this mean?  Let’s break it down. Functions are pieces of Javascript or SQL code that execute in your data warehouse.  The code itself is written by developers and is intended to add features and functionality to your data warehouse, beyond the traditional SQL commands that Snowflake already offers.  External Functions are similar, except they are not hosted on Snowflake, and do not execute within the context of your data warehouse.  Instead, they are hosted elsewhere, accessed via an HTTP endpoint, and computed using third-party compute resources.  When making a call to a function, the value is computed using Snowflake’s compute resources.  External Function values are computed using external resources, and the results are returned via HTTP. For example, if you had access to an external service that mapped zip codes to cities, the typical approach to leveraging this service without external functions would be to import the keys and values of cities and zip-codes to a table and then query that table.  Then you could select cities from the zipcode_to_city table where the zip-code is some value.  For example,    Create the table zipcode_to_city.   Create an ETL pipeline that batch loads zipcode_to_city with the zipcodes and cities from your source system.   Automate this ETL pipeline to update the table when/if changes happen.   Run select city from zipcode_to_city where zip = &#39;11102&#39;;.   (Optional) Create a function that replaces this query for you in other queries. This is standard practice for integrating databases with external systems.  The problem here is you have to maintain an ETL pipeline to keep your downstream database up to date.  Additionally, you have another table to query which could impact the performance of queries downstream.  Now imagine having to do this for several external systems of record beyond just zip code - city mappings.  It’s easy to see how this could get complicated quickly. Now, with external functions, you can create the zipcode_to_city_external_function and get the same data as you would have if you imported the table.  The only difference now is that instead of importing a table to Snowflake, you import only the data you need, when you need it, via HTTPS.  After configuring your function (which we’ll see how to do later), you can call it in SQL like this:     select zipcode_to_city_external_function(zipcode);          The function zipcode_to_city_external_function replaces the typical call to your reference table and the value is imported and used in the rest of your SQL statement.  Now you don’t have to maintain a reference table of zip-code – city mappings because you’ve offloaded that functionality to a third-party service.     Creating an External Function     I’m not going to spend time breaking out syntax associated with creating an external function.  If you want to know the syntax options, check the Snowflake documentation associated with External Functions.  Instead, I’ll go through the typical workflow required to create and use an External Function on AWS.      Configure access to external function (IAM)   Create an API Integration object in Snowflake (API Gateway)   Create the External Function     Configuring Access     The first thing to do is to create the IAM assets used by Snowflake to make calls to your AWS hosted function.  Due to limitations we’ll explore later in this post, Snowflake must call API Gateway.  As a result, we’ll create this policy where you’ll specify your own hosting API ARN:     {  &quot;Version&quot;: &quot;2012-10-17&quot;,  &quot;Statement&quot;: [      {          &quot;Sid&quot;: &quot;VisualEditor0&quot;,          &quot;Effect&quot;: &quot;Allow&quot;,          &quot;Action&quot;: [              &quot;apigateway:DELETE&quot;,              &quot;apigateway:PUT&quot;,              &quot;apigateway:PATCH&quot;,              &quot;apigateway:POST&quot;,              &quot;apigateway:GET&quot;          ],          &quot;Resource&quot;: &quot;&lt;API GATEWAY ARN&gt;&quot;      }  ] }          Now we create a role.  This role is a little different from your typical role as it requires access from a third party.  Note in the image below we select “Another AWS account” as the trusted entity, specifying a dummy ID in the external ID field.  When creating this role, specify your own account’s Account ID in the Account ID field.  After you’ve done this, add the policy we created above to this role and complete the role creation. !     Configure Snowflake-Side Access     What we’ve done to this point is setup a templated access to AWS from Snowflake on the AWS side.  There’s still some configuration we need to create on the Snowflake side before we can go back and finalize our AWS configuration. External Functions require a Snowflake construct called an API Integration.  These constructs are logical endpoints within Snowflake that store references to external APIs.  See the below code snippet for more information.     CREATE API INTEGRATION IF NOT EXISTS external_integration  API_PROVIDER = aws_api_gateway  API_AWS_ROLE_ARN = &#39;&lt;ARN OF ROLE CREATED BEFORE&gt;&#39;  ENABLED = TRUE  API_ALLOWED_PREFIXES = (&#39;&lt;API GATEWAY DEPLOYMENT URL&#39;)  COMMENT = &#39;AWS Hosted API Gateway Integration&#39;  ;          By running this snippet and replacing the values referenced with the role we created earlier and the API deployment that hosts your external function, we have created an API Integration.  This is important for configuring access for the external function later on. Once this stage is created, we need to gather some information about it.  Run the following command and be sure to save the output for your reference:     DESC API INTEGRATION external_integration;          The output for this command shows some meta-data about the API Integration that we specified when creating the integration.  It also includes two important fields called API_AWS_EXTERNAL_ID and API_AWS_IAM_USER_ARN.  We’ll need these fields to continue configuring access  to AWS.  Record these field values and return to the AWS IAM console.     Modifying AWS Access     Go back to AWS IAM and modify the role we created at the beginning of this post.  Navigate to the “Trust Relationship” tab and edit this policy.  When you open the policy document, it should look something like this:     {   &quot;Version&quot;: &quot;2012-10-17&quot;,   &quot;Statement&quot;: [  {    &quot;Effect&quot;: &quot;Allow&quot;,    &quot;Principal&quot;: {      &quot;AWS&quot;: &quot;&lt;YOUR ACCOUNBT ID&gt;&quot;    },    &quot;Action&quot;: &quot;sts:AssumeRole&quot;,    &quot;Condition&quot;: {      &quot;StringEquals&quot;: {        &quot;sts:ExternalId&quot;: &quot;&lt;DUMMY ID&gt;&quot;      }    }  }   ] }          Replace the ARN containing your Account ID with the API_AWS_IAM_USER_ARN value from the previous query we ran in Snowflake.  Then replace the Dummy ID with the API_AWS_EXTERNAL_ID from the previous query.  The results should look like the following:     {   &quot;Version&quot;: &quot;2012-10-17&quot;,   &quot;Statement&quot;: [  {    &quot;Effect&quot;: &quot;Allow&quot;,    &quot;Principal&quot;: {      &quot;AWS&quot;: &quot;&lt;API_AWS_IAM_USER_ARN&gt;&quot;    },    &quot;Action&quot;: &quot;sts:AssumeRole&quot;,    &quot;Condition&quot;: {      &quot;StringEquals&quot;: {        &quot;sts:ExternalId&quot;: &quot;&lt;API_AWS_EXTERNAL_ID&gt;&quot;      }    }  }   ] }          What this does is allow the Snowflake asset you created with the API_AWS_EXTERNAL_ID and API_AWS_IAM_USER_ARN specified to assume the role with the permissions we gave it.  Based on this blog post, that means access to call an API Gateway endpoint.  If you modify this role to have new policies though, that means you will grant this third party service all of those new policies.  For more details,  check out this how-to guide published by Snowflake on this topic.     Creating the External Function     After all that back and forth, this is the easy part.  Following the syntax for an External Function, we should be sending something like the following to Snowflake:     CREATE OR REPLACE SECURE EXTERNAL FUNCTION zipcode_to_city_external_function (zipcode VARCHAR)   RETURNS VARCHAR   NOT NULL   RETURNS NULL ON NULL INPUT   VOLATILE   COMMENT = &#39;Returns a city for the given zip-code.&#39;   API_INTEGRATION = external_integration   HEADERS = (&#39;content-type&#39; = &#39;application/json&#39;)   AS &#39;&lt;API ENDPOINT URL&gt;&#39;   ;          Notice how we specify an empty list of parameters, a return type, and the API Integration object we created earlier.  The API Integration object allows this external function to assume the role we specified, giving Snowflake the ability to query API Gateway as an external service. To use this external function, all we have to do is call our function like you would any User-Defined Function:     SELECT zipcode_to_city_external_function(&quot;11102&quot;);          The results of this function call will vary based on the back-end implementation, but in my demo the result is:     ZIPCODE_TO_CITY_EXTERNAL_FUNCTION(&quot;11102&quot;) ASTORIA      The following is the backend implementation for this endpoint: ```nodejs exports.handler = async (event) =&gt; {      ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2020-06-16T00:00:00-04:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/posts/snowflake-external-functions">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Dan Ferguson",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/ferg_in","https://www.linkedin.com/in/daniel-ferguson-985b7048","https://sessionize.com/dferguson992/"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ferg in the Clouds Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Ferg in the Clouds
+          <span class="site-subtitle">Dan's Blog</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/aboutme/">About Me</a>
+            </li><li class="masthead__menu-item">
+              <a href="/profexp/">Professional Experience</a>
+            </li><li class="masthead__menu-item">
+              <a href="/certs/">Certifications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/posts/">Blog Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/media/">Media</a>
+            </li><li class="masthead__menu-item">
+              <a href="/unprofesh/">Un-Professional</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/posts" itemprop="item"><span itemprop="name">Posts</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Snowflake External Functions</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/logo.png" alt="Dan Ferguson" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Ferguson</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Solutions Architect and the author of this blog.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">New York, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="mailto:dferguson@ipponusa.com" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Snowflake External Functions</h1>
+    
+    <p>Snowflake is a cloud-based data warehousing company.  They specialize in provisioning on-demand compute and elastic storage for data warehousing applications on a pay-per-use pricing model.  <a href="https://www.analytics.today/blog/oracle-vs-snowflake">In recent years</a> they’ve dominated the <a href="https://www.prnewswire.com/news-releases/snowflake-more-than-triples-revenue-and-customer-base-doubles-post-money-valuation-all-in-just-one-year-300793857.html">cloud data-warehouse</a> industry.  Recently they announced a few new product features.  In this post, we’re going to discuss one of those features, External Functions.</p>
+<h2 id="external-functions">External Functions</h2>
+<p><a href="https://docs.snowflake.com/en/sql-reference/external-functions-introduction.html">External Functions</a> in Snowflake are functions hosted on a different platform.  What does this mean?  Let’s break it down.
+<a href="https://docs.snowflake.com/en/sql-reference/user-defined-functions.html">Functions</a> are pieces of Javascript or SQL code that execute in your data warehouse.  The code itself is written by developers and is intended to add features and functionality to your data warehouse, beyond the traditional SQL commands that Snowflake already offers.  External Functions are similar, except they are not hosted on Snowflake, and do not execute within the context of your data warehouse.  Instead, they are hosted elsewhere, accessed via an HTTP endpoint, and computed using third-party compute resources.  When making a call to a function, the value is computed using Snowflake’s compute resources.  External Function values are computed using external resources, and the results are returned via HTTP.
+For example, if you had access to an external service that mapped zip codes to cities, the typical approach to leveraging this service without external functions would be to import the keys and values of cities and zip-codes to a table and then query that table.  Then you could select cities from the <code class="highlighter-rouge">zipcode_to_city</code> table where the zip-code is some value.  For example,</p>
+<ol>
+  <li>Create the table <code class="highlighter-rouge">zipcode_to_city</code>.</li>
+  <li>Create an ETL pipeline that batch loads <code class="highlighter-rouge">zipcode_to_city</code> with the zipcodes and cities from your source system.</li>
+  <li>Automate this ETL pipeline to update the table when/if changes happen.</li>
+  <li>Run <code class="highlighter-rouge">select city from zipcode_to_city where zip = '11102';</code>.</li>
+  <li>(Optional) Create a function that replaces this query for you in other queries.
+This is standard practice for integrating databases with external systems.  The problem here is you have to maintain an ETL pipeline to keep your downstream database up to date.  Additionally, you have another table to query which could impact the performance of queries downstream.  Now imagine having to do this for several external systems of record beyond just zip code - city mappings.  It’s easy to see how this could get complicated quickly.
+Now, with external functions, you can create the <code class="highlighter-rouge">zipcode_to_city_external_function</code> and get the same data as you would have if you imported the table.  The only difference now is that instead of importing a table to Snowflake, you import only the data you need, when you need it, via HTTPS.  After configuring your function (which we’ll see how to do later), you can call it in SQL like this:
+    <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="n">zipcode_to_city_external_function</span><span class="p">(</span><span class="n">zipcode</span><span class="p">);</span>
+</code></pre></div>    </div>
+    <p>The function <code class="highlighter-rouge">zipcode_to_city_external_function</code> replaces the typical call to your reference table and the value is imported and used in the rest of your SQL statement.  Now you don’t have to maintain a reference table of zip-code – city mappings because you’ve offloaded that functionality to a third-party service.</p>
+    <h2 id="creating-an-external-function">Creating an External Function</h2>
+    <p>I’m not going to spend time breaking out syntax associated with creating an external function.  If you want to know the syntax options, check the Snowflake documentation associated with <a href="https://docs.snowflake.com/en/sql-reference/sql/create-external-function.html#usage-notes">External Functions</a>.  Instead, I’ll go through the typical workflow required to create and use an External Function on AWS.</p>
+  </li>
+  <li>Configure access to external function (IAM)</li>
+  <li>Create an API Integration object in Snowflake (API Gateway)</li>
+  <li>Create the External Function
+    <h3 id="configuring-access">Configuring Access</h3>
+    <p>The first thing to do is to create the IAM assets used by Snowflake to make calls to your AWS hosted function.  Due to limitations we’ll explore later in this post, Snowflake must call API Gateway.  As a result, we’ll create this policy where you’ll specify your own hosting API ARN:</p>
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+ </span><span class="s2">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+ </span><span class="s2">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+     </span><span class="p">{</span><span class="w">
+         </span><span class="s2">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"VisualEditor0"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+             </span><span class="s2">"apigateway:DELETE"</span><span class="p">,</span><span class="w">
+             </span><span class="s2">"apigateway:PUT"</span><span class="p">,</span><span class="w">
+             </span><span class="s2">"apigateway:PATCH"</span><span class="p">,</span><span class="w">
+             </span><span class="s2">"apigateway:POST"</span><span class="p">,</span><span class="w">
+             </span><span class="s2">"apigateway:GET"</span><span class="w">
+         </span><span class="p">],</span><span class="w">
+         </span><span class="s2">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;API GATEWAY ARN&gt;"</span><span class="w">
+     </span><span class="p">}</span><span class="w">
+ </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+    <p>Now we create a role.  This role is a little different from your typical role as it requires access from a third party.  Note in the image below we select “Another AWS account” as the trusted entity, specifying a dummy ID in the external ID field.  When creating this role, specify your own account’s Account ID in the Account ID field.  After you’ve done this, add the policy we created above to this role and complete the role creation.
+<a href="https://blog.ippon.tech/content/images/2020/06/Screen-Shot-2020-06-15-at-10.29.03-AM.png">!</a></p>
+    <h3 id="configure-snowflake-side-access">Configure Snowflake-Side Access</h3>
+    <p>What we’ve done to this point is setup a templated access to AWS from Snowflake on the AWS side.  There’s still some configuration we need to create on the Snowflake side before we can go back and finalize our AWS configuration.<br />
+External Functions require a Snowflake construct called an <a href="https://docs.snowflake.com/en/sql-reference/sql/create-api-integration.html">API Integration</a>.  These constructs are logical endpoints within Snowflake that store references to external APIs.  See the below code snippet for more information.</p>
+    <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="n">API</span> <span class="n">INTEGRATION</span> <span class="n">IF</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="n">external_integration</span>
+ <span class="n">API_PROVIDER</span> <span class="o">=</span> <span class="n">aws_api_gateway</span>
+ <span class="n">API_AWS_ROLE_ARN</span> <span class="o">=</span> <span class="s1">'&lt;ARN OF ROLE CREATED BEFORE&gt;'</span>
+ <span class="n">ENABLED</span> <span class="o">=</span> <span class="k">TRUE</span>
+ <span class="n">API_ALLOWED_PREFIXES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'&lt;API GATEWAY DEPLOYMENT URL'</span><span class="p">)</span>
+ <span class="k">COMMENT</span> <span class="o">=</span> <span class="s1">'AWS Hosted API Gateway Integration'</span>
+ <span class="p">;</span>
+</code></pre></div>    </div>
+    <p>By running this snippet and replacing the values referenced with the role we created earlier and the API deployment that hosts your external function, we have created an API Integration.  This is important for configuring access for the external function later on.<br />
+Once this stage is created, we need to gather some information about it.  Run the following command and be sure to save the output for your reference:</p>
+    <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">DESC</span> <span class="n">API</span> <span class="n">INTEGRATION</span> <span class="n">external_integration</span><span class="p">;</span>
+</code></pre></div>    </div>
+    <p>The output for this command shows some meta-data about the API Integration that we specified when creating the integration.  It also includes two important fields called <strong>API_AWS_EXTERNAL_ID</strong> and <strong>API_AWS_IAM_USER_ARN</strong>.  We’ll need these fields to continue configuring access  to AWS.  Record these field values and return to the AWS IAM console.</p>
+    <h3 id="modifying-aws-access">Modifying AWS Access</h3>
+    <p>Go back to AWS IAM and modify the role we created at the beginning of this post.  Navigate to the “Trust Relationship” tab and edit this policy.  When you open the policy document, it should look something like this:</p>
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+ </span><span class="p">{</span><span class="w">
+   </span><span class="s2">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+   </span><span class="s2">"Principal"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="s2">"AWS"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;YOUR ACCOUNBT ID&gt;"</span><span class="w">
+   </span><span class="p">},</span><span class="w">
+   </span><span class="s2">"Action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sts:AssumeRole"</span><span class="p">,</span><span class="w">
+   </span><span class="s2">"Condition"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="s2">"StringEquals"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+       </span><span class="s2">"sts:ExternalId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;DUMMY ID&gt;"</span><span class="w">
+     </span><span class="p">}</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+ </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+    <p>Replace the ARN containing your Account ID with the <strong>API_AWS_IAM_USER_ARN</strong> value from the previous query we ran in Snowflake.  Then replace the Dummy ID with the <strong>API_AWS_EXTERNAL_ID</strong> from the previous query.  The results should look like the following:</p>
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+ </span><span class="p">{</span><span class="w">
+   </span><span class="s2">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+   </span><span class="s2">"Principal"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="s2">"AWS"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;API_AWS_IAM_USER_ARN&gt;"</span><span class="w">
+   </span><span class="p">},</span><span class="w">
+   </span><span class="s2">"Action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sts:AssumeRole"</span><span class="p">,</span><span class="w">
+   </span><span class="s2">"Condition"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="s2">"StringEquals"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+       </span><span class="s2">"sts:ExternalId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;API_AWS_EXTERNAL_ID&gt;"</span><span class="w">
+     </span><span class="p">}</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+ </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+    <p>What this does is allow the Snowflake asset you created with the <strong>API_AWS_EXTERNAL_ID</strong> and <strong>API_AWS_IAM_USER_ARN</strong> specified to assume the role with the permissions we gave it.  Based on this blog post, that means access to call an API Gateway endpoint.  If you modify this role to have new policies though, that means you will grant this third party service all of those new policies.  For more details,  check out this how-to guide published by Snowflake on this topic.</p>
+    <h3 id="creating-the-external-function">Creating the External Function</h3>
+    <p>After all that back and forth, this is the easy part.  Following the <a href="https://docs.snowflake.com/en/sql-reference/sql/create-external-function.html#usage-notes">syntax for an External Function</a>, we should be sending something like the following to Snowflake:</p>
+    <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="n">SECURE</span> <span class="k">EXTERNAL</span> <span class="k">FUNCTION</span> <span class="n">zipcode_to_city_external_function</span> <span class="p">(</span><span class="n">zipcode</span> <span class="n">VARCHAR</span><span class="p">)</span>
+  <span class="k">RETURNS</span> <span class="n">VARCHAR</span>
+  <span class="k">NOT</span> <span class="k">NULL</span>
+  <span class="k">RETURNS</span> <span class="k">NULL</span> <span class="k">ON</span> <span class="k">NULL</span> <span class="k">INPUT</span>
+  <span class="k">VOLATILE</span>
+  <span class="k">COMMENT</span> <span class="o">=</span> <span class="s1">'Returns a city for the given zip-code.'</span>
+  <span class="n">API_INTEGRATION</span> <span class="o">=</span> <span class="n">external_integration</span>
+  <span class="n">HEADERS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'content-type'</span> <span class="o">=</span> <span class="s1">'application/json'</span><span class="p">)</span>
+  <span class="k">AS</span> <span class="s1">'&lt;API ENDPOINT URL&gt;'</span>
+  <span class="p">;</span>
+</code></pre></div>    </div>
+    <p>Notice how we specify an empty list of parameters, a return type, and the API Integration object we created earlier.  The API Integration object allows this external function to assume the role we specified, giving Snowflake the ability to query API Gateway as an external service.
+To use this external function, all we have to do is call our function like you would any User-Defined Function:</p>
+    <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">zipcode_to_city_external_function</span><span class="p">(</span><span class="nv">"11102"</span><span class="p">);</span>
+</code></pre></div>    </div>
+    <p>The results of this function call will vary based on the back-end implementation, but in my demo the result is:</p>
+    <pre><code class="language-csv">ZIPCODE_TO_CITY_EXTERNAL_FUNCTION("11102")
+ASTORIA
+</code></pre>
+    <p>The following is the backend implementation for this endpoint:</p>
+    <pre><code class="language-nodejs">exports.handler = async (event) =&gt; {
+
+ // MAGIC HAPPENS HERE
+ city = CALL_TO_CITY_ZIP_MAPPER(event)
+ const response = {
+     data: [
+         [0, city]
+     ]
+ };
+ return response;
+};
+</code></pre>
+    <p>Obviously this is a hard-coded example.  I’ve hard-coded the response here to show the formatting of a response that Snowflake expects.  If you do not format your output like this you’ll get an error like <code class="highlighter-rouge">external function top-level JSON object must contain "data" JSON array element</code>.   This may seem strange at first, but it makes a lot of sense when you break it down.  Snowflake is, at the end of the day, a database.  It stores data in a structured way; when it integrates with third parties it expects the third party to respect that data quality requirement.  As a result, we have this strange JSON-esque syntax being returned by the lambda function.  For more information on this, check out Snowflake’s documentation about <a href="https://docs.snowflake.com/en/sql-reference/external-functions-general.html#data-format-sent-from-snowflake">creating External Functions for different platforms</a>.</p>
+    <h2 id="limitations--gotchas-to-external-functions">Limitations &amp; Gotcha’s to External Functions</h2>
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   * External Functions need to be called through an HTTP proxy service.  This service is referenced in the API_INTEGRATION field.  Currently, the only supported API Integration objects are those hosted on API Gateway.
+   * External Function calls cannot be used to define the default value of a column when creating a table.
+   * External Functions must return scalar values that match the return type of the external function.  Returned values must also match the number of rows which are being used.
+   * External Functions always make POST requests.
+   * The top-level response must be a series of name-value pairs sent as a JSON array labeled "data."
+   * Lambda functions that integrate with API Gateway by proxy will have to include the expected API Gateway response object, as well as the expected Snowflake data object.
+   * Backend integrations do not have to be Lambda functions, they just have to be hosted via API Gateway (at this time).
+   * If you ever re-create your API Integration object in Snowflake, you will have to modify the IAM role.  You just have to modify the API_AWS_EXTERNAL_ID, the API_AWS_IAM_USER_ARN field should stay the same (unless your Snowflake user changes).  For more details on the limitations of external functions, and the additional considerations you should take when creating external functions, check the [Snowflake documentation](https://docs.snowflake.com/en/sql-reference/external-functions-introduction.html#limitations-of-external-functions) on the subject.
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">2</span>
+      </a>
+    </li>
+  
+    <li>
+      <a href="#2019">
+        <strong>2019</strong> <span class="taxonomy__count">9</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/snowflake-external-functions" rel="permalink">Snowflake External Functions
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Snowflake is a cloud-based data warehousing company.  They specialize in provisioning on-demand compute and elastic storage for data warehousing applications...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/hipaa-compliant-message-bus" rel="permalink">Building a HIPAA Compliant Message Bus with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  11 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">What is Solace?
+Solace are the makers of the Solace PubSub+ Platform which is used to event enable your enterprise. The core of the platform is the Solace Pu...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+  <section id="2019" class="taxonomy__section">
+    <h2 class="archive__subtitle">2019</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/creating-an-event-driven-jhipster-application-with-solace" rel="permalink">Creating an Event Driven jHipster Application with Solace
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today, the modern web-application is event driven.  In order to be an event-driven application, you need two things: the event, and message bus or mesh on wh...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-well-architected-2020" rel="permalink">AWS Well-Architected 2020
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon USA has been working to lock in Well-Architected status in the North America region for the last six months.  By the end of 2019, Ippon USA will join I...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/java-13-release-features" rel="permalink">Java 13 Release Features
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ever since Oracle took over the long-term advancement of the Java programming language, Java has been upgraded on a semi-annual release schedule.  Tuesday, S...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/ippons-rva-war-tour" rel="permalink">Ippon’s RVA WAR Tour
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ippon Technologies recently trained their two North America based Solutions Architects to conduct Well-Architected Reviews.  I am one of those architects, an...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/aws-white-paper-in-5-minutes-or-less-best-practices-for-emr" rel="permalink">Best Practices for Amazon EMR
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This blog post summarizes the main points in the AWS white paper titled “Best Practices for Amazon EMR” written by Parviz Deyhim in August 2013.  The paper c...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-3" rel="permalink">Using Swagger to Build Effective APIs Part 3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  9 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-2" rel="permalink">Using Swagger to Build Effective APIs Part 2
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This post is a continuation in a discussion on developing APIs which prescribe to the Open API 3.0 specification using Swagger tools.  In this post, we will ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/using-swagger-to-build-effective-apis-part-1" rel="permalink">Using Swagger to Build Effective APIs Part 1
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The rise of serverless computing and platform agnostic, app-based services use has forced the casual developer to learn proper API development, a task usuall...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/posts/comparing-java-lts-releases" rel="permalink">Comparing Java LTS Releases
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  18 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The last 5 years have seen some rapid changes in the way new versions of the Java Development Kit is deployed and maintained.  Traditionally, new Java versio...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to Top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/ferg_in" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/dferguson992" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Dan Ferguson. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

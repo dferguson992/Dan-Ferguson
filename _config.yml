@@ -34,15 +34,16 @@ logo: "/assets/images/ibHgWmquSUmAP+wZdVqJMw_thumb_1.jpg"
 social:
   links:
     - "https://twitter.com/ferg_in"
-    - "https://www.linkedin.com/in/yourprofile"
+    - "https://www.linkedin.com/in/daniel-ferguson-985b7048"
+    - "https://sessionize.com/dferguson992/"
 
 ###############
 # COLLECTIONS #
 ###############
-collections:
-  awsportfolio:
-    output: true
-    permalink: /:collection/:path/
+#collections:
+#  awsportfolio:
+#    output: true
+#    permalink: /:collection/:path/
 
 
 ################
@@ -57,6 +58,9 @@ author:
     - label: "Twitter"
       icon: "fas fa-fw fa-link"
       url: "https://twitter.com/ferg_in"
+    - label: "Email"
+      icon: "fas fa-fw fa-link"
+      url: "mailto:dferguson@ipponusa.com"
 
 ###############
 # SITE FOOTER #
@@ -86,10 +90,10 @@ defaults:
       share: true
       related: true
   # _portfolio
-  - scope:
-      path: ""
-      type: awsportfolio
-    values:
-      layout: single
-      author_profile: false
-      share: true
+  #- scope:
+  #    path: ""
+  #    type: awsportfolio
+  #  values:
+  #    layout: single
+  #    author_profile: false
+  #    share: true
